@@ -1,21 +1,21 @@
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:getx_gallery/data/isolates/find_images_isolate.dart';
 import 'package:getx_gallery/data/repository/local_datasource.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
 import 'file:///C:/Applications/android-projects/getx_gallery/lib/utils/buffers/buffer.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 
 class RepositoryImpl implements Repository{
   final LocalDataSource _localDataSource = Get.find<LocalDataSource>();
 
-  final pathStream = MiniStream<String>();
+  final pathStream = MiniStream<List<String>>();
   List<String> _paths = [];
 
 
   @override
-  MiniStream<String> watchPaths() => pathStream;
+  MiniStream<List<String>> watchPaths() => pathStream;
 
 
 
@@ -39,20 +39,12 @@ class RepositoryImpl implements Repository{
     if(_paths.isEmpty) {
       _paths = await _localDataSource.getPaths();
     }
-    final buffer = Buffer(size: 2000, data: <String>[], onOverflow: (data) => addPaths(data as List<String>));
     final storageInfo = await PathProviderEx.getStorageInfo();
     for(final e in storageInfo){
-      Directory(e.rootDir).list(recursive: true, followLinks: false).listen((event) {
-        if(event.path.contains(RegExp(r'\.(gif|jpe?g|tiff?|png|webp|bmp)$'))){
-          if(!_paths.contains(event.path)) {
-            _paths.add(event.path);
-            pathStream.add(event.path);
-            buffer.add(event.path);
-          }
-        }
-      },
-          onDone: () {
-        addPaths(buffer.data as List<String>);
+      findImageIsolate(_paths, e.rootDir, (data) {
+        _paths.addAll(data);
+        pathStream.add(data);
+        addPaths(data);
       });
     }
   }

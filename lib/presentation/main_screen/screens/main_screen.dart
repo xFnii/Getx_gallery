@@ -18,11 +18,7 @@ class MainScreen extends StatelessWidget{
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: ()=> c.find())
-        ],
-      ),
+      appBar: AppBar(),
       body: _buildGrid(),
     );
   }
@@ -30,7 +26,18 @@ class MainScreen extends StatelessWidget{
   Widget _buildGrid(){
     return Obx(()=>
         DraggableScrollbar.arrows(
-          labelTextBuilder: (double offset) => Text('${offset ~/ 100}'),
+          labelConstraints: BoxConstraints(
+            maxWidth: Get.width-60,
+            maxHeight: 40,
+          ),
+          labelTextBuilder: (double offset) =>
+              Text(
+                c.keys[offset ~/ 100].substring(c.keys[offset ~/ 100].lastIndexOf('/')+1, c.keys[offset ~/ 100].length),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
           controller: _controller,
           child: GridView.builder(
             controller: _controller,
@@ -53,11 +60,11 @@ class MainScreen extends StatelessWidget{
       child: Stack(
         children: [
           Container(
-            margin: const EdgeInsets.all(1),
+            margin: index.isOdd? const EdgeInsets.all(1): const EdgeInsets.fromLTRB(0, 1, 1, 1),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               image: DecorationImage(
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
                 image: FileImage(File(c.folders[folder][0]))
               )
             ),

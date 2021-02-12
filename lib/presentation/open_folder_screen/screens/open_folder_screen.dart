@@ -45,7 +45,18 @@ class OpenFolderScreen extends StatelessWidget{
   Widget _buildGrid(){
     return Obx(()=>
         DraggableScrollbar.arrows(
-          labelTextBuilder: (double offset) => Text('${offset ~/ 100}'),
+          labelConstraints: BoxConstraints(
+            maxWidth: Get.width-60,
+            maxHeight: 40,
+          ),
+          labelTextBuilder: (double offset) =>
+              Text(
+                c.images[offset ~/ 100].path.substring(c.images[offset ~/ 100].path.lastIndexOf('/')+1, c.images[offset ~/ 100].path.length),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
           controller: _controller,
           child:
           GridView.builder(

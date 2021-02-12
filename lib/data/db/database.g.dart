@@ -9,17 +9,18 @@ part of 'database.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class Path extends DataClass implements Insertable<Path> {
   final String fullPath;
-  final String folder;
-  Path({@required this.fullPath, @required this.folder});
+  final Uint8List thumbnails;
+  Path({@required this.fullPath, this.thumbnails});
   factory Path.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
     final stringType = db.typeSystem.forDartType<String>();
+    final uint8ListType = db.typeSystem.forDartType<Uint8List>();
     return Path(
       fullPath: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}full_path']),
-      folder:
-          stringType.mapFromDatabaseResponse(data['${effectivePrefix}folder']),
+      thumbnails: uint8ListType
+          .mapFromDatabaseResponse(data['${effectivePrefix}thumbnails']),
     );
   }
   @override
@@ -28,8 +29,8 @@ class Path extends DataClass implements Insertable<Path> {
     if (!nullToAbsent || fullPath != null) {
       map['full_path'] = Variable<String>(fullPath);
     }
-    if (!nullToAbsent || folder != null) {
-      map['folder'] = Variable<String>(folder);
+    if (!nullToAbsent || thumbnails != null) {
+      map['thumbnails'] = Variable<Uint8List>(thumbnails);
     }
     return map;
   }
@@ -39,8 +40,9 @@ class Path extends DataClass implements Insertable<Path> {
       fullPath: fullPath == null && nullToAbsent
           ? const Value.absent()
           : Value(fullPath),
-      folder:
-          folder == null && nullToAbsent ? const Value.absent() : Value(folder),
+      thumbnails: thumbnails == null && nullToAbsent
+          ? const Value.absent()
+          : Value(thumbnails),
     );
   }
 
@@ -49,7 +51,7 @@ class Path extends DataClass implements Insertable<Path> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Path(
       fullPath: serializer.fromJson<String>(json['fullPath']),
-      folder: serializer.fromJson<String>(json['folder']),
+      thumbnails: serializer.fromJson<Uint8List>(json['thumbnails']),
     );
   }
   @override
@@ -57,59 +59,59 @@ class Path extends DataClass implements Insertable<Path> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'fullPath': serializer.toJson<String>(fullPath),
-      'folder': serializer.toJson<String>(folder),
+      'thumbnails': serializer.toJson<Uint8List>(thumbnails),
     };
   }
 
-  Path copyWith({String fullPath, String folder}) => Path(
+  Path copyWith({String fullPath, Uint8List thumbnails}) => Path(
         fullPath: fullPath ?? this.fullPath,
-        folder: folder ?? this.folder,
+        thumbnails: thumbnails ?? this.thumbnails,
       );
   @override
   String toString() {
     return (StringBuffer('Path(')
           ..write('fullPath: $fullPath, ')
-          ..write('folder: $folder')
+          ..write('thumbnails: $thumbnails')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(fullPath.hashCode, folder.hashCode));
+  int get hashCode => $mrjf($mrjc(fullPath.hashCode, thumbnails.hashCode));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Path &&
           other.fullPath == this.fullPath &&
-          other.folder == this.folder);
+          other.thumbnails == this.thumbnails);
 }
 
 class PathsCompanion extends UpdateCompanion<Path> {
   final Value<String> fullPath;
-  final Value<String> folder;
+  final Value<Uint8List> thumbnails;
   const PathsCompanion({
     this.fullPath = const Value.absent(),
-    this.folder = const Value.absent(),
+    this.thumbnails = const Value.absent(),
   });
   PathsCompanion.insert({
     @required String fullPath,
-    @required String folder,
-  })  : fullPath = Value(fullPath),
-        folder = Value(folder);
+    this.thumbnails = const Value.absent(),
+  }) : fullPath = Value(fullPath);
   static Insertable<Path> custom({
     Expression<String> fullPath,
-    Expression<String> folder,
+    Expression<Uint8List> thumbnails,
   }) {
     return RawValuesInsertable({
       if (fullPath != null) 'full_path': fullPath,
-      if (folder != null) 'folder': folder,
+      if (thumbnails != null) 'thumbnails': thumbnails,
     });
   }
 
-  PathsCompanion copyWith({Value<String> fullPath, Value<String> folder}) {
+  PathsCompanion copyWith(
+      {Value<String> fullPath, Value<Uint8List> thumbnails}) {
     return PathsCompanion(
       fullPath: fullPath ?? this.fullPath,
-      folder: folder ?? this.folder,
+      thumbnails: thumbnails ?? this.thumbnails,
     );
   }
 
@@ -119,8 +121,8 @@ class PathsCompanion extends UpdateCompanion<Path> {
     if (fullPath.present) {
       map['full_path'] = Variable<String>(fullPath.value);
     }
-    if (folder.present) {
-      map['folder'] = Variable<String>(folder.value);
+    if (thumbnails.present) {
+      map['thumbnails'] = Variable<Uint8List>(thumbnails.value);
     }
     return map;
   }
@@ -129,7 +131,7 @@ class PathsCompanion extends UpdateCompanion<Path> {
   String toString() {
     return (StringBuffer('PathsCompanion(')
           ..write('fullPath: $fullPath, ')
-          ..write('folder: $folder')
+          ..write('thumbnails: $thumbnails')
           ..write(')'))
         .toString();
   }
@@ -151,20 +153,20 @@ class $PathsTable extends Paths with TableInfo<$PathsTable, Path> {
     );
   }
 
-  final VerificationMeta _folderMeta = const VerificationMeta('folder');
-  GeneratedTextColumn _folder;
+  final VerificationMeta _thumbnailsMeta = const VerificationMeta('thumbnails');
+  GeneratedBlobColumn _thumbnails;
   @override
-  GeneratedTextColumn get folder => _folder ??= _constructFolder();
-  GeneratedTextColumn _constructFolder() {
-    return GeneratedTextColumn(
-      'folder',
+  GeneratedBlobColumn get thumbnails => _thumbnails ??= _constructThumbnails();
+  GeneratedBlobColumn _constructThumbnails() {
+    return GeneratedBlobColumn(
+      'thumbnails',
       $tableName,
-      false,
+      true,
     );
   }
 
   @override
-  List<GeneratedColumn> get $columns => [fullPath, folder];
+  List<GeneratedColumn> get $columns => [fullPath, thumbnails];
   @override
   $PathsTable get asDslTable => this;
   @override
@@ -182,11 +184,11 @@ class $PathsTable extends Paths with TableInfo<$PathsTable, Path> {
     } else if (isInserting) {
       context.missing(_fullPathMeta);
     }
-    if (data.containsKey('folder')) {
-      context.handle(_folderMeta,
-          folder.isAcceptableOrUnknown(data['folder'], _folderMeta));
-    } else if (isInserting) {
-      context.missing(_folderMeta);
+    if (data.containsKey('thumbnails')) {
+      context.handle(
+          _thumbnailsMeta,
+          thumbnails.isAcceptableOrUnknown(
+              data['thumbnails'], _thumbnailsMeta));
     }
     return context;
   }

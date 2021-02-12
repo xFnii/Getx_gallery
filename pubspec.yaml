@@ -24,6 +24,8 @@ dependencies:
   permission_handler: ^5.1.0+2
   path_provider_ex: ^1.0.1
   draggable_scrollbar: ^0.0.4
+  flutter_image_compress: ^0.7.0
+  isolate_handler: ^0.3.1
   flutter:
     sdk: flutter
   get: ^3.24.0

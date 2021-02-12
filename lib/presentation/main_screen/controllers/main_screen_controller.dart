@@ -13,9 +13,6 @@ class MainScreenController extends GetxController{
 
   final keys = <String>[].obs;
 
-  final _tmpFolders = <String, List<String>>{};
-  final _bufferSize = 2000;
-
 
   @override
   Future onInit() async{
@@ -27,48 +24,32 @@ class MainScreenController extends GetxController{
 
   @override
   Future onReady() async {
-    await Permission.storage.request();
+    if (await Permission.storage.request().isGranted){
+      find();
+    }
     super.onReady();
   }
 
   void sortByName(){
-    keys.replaceRange(0, keys.length, folders.keys.toList()..sort((a,b)=>a.substring(a.lastIndexOf('/')+1, a.length).compareTo(b.substring(b.lastIndexOf('/')+1, b.length))));
+    keys.replaceRange(0, keys.length, folders.keys.toList()..sort((a,b)=>a.substring(a.lastIndexOf('/')+1, a.length).toLowerCase().compareTo(b.substring(b.lastIndexOf('/')+1, b.length).toLowerCase())));
   }
 
-  void find() => _repo.find();
+  void find() async => _repo.find();
 
   void _listenPathStream(){
-    var buffer = 0;
     _repo.watchPaths().listen((event) {
-      final folderPath = event.substring(0, event.lastIndexOf('/'));
-      buffer++;
-      if(_tmpFolders.containsKey(folderPath)){
-        _tmpFolders[folderPath].add(event);
-      } else {
-        _tmpFolders[folderPath] = [event];
-      }
-      if(buffer>_bufferSize){
-        for(final key in _tmpFolders.keys){
-          if(folders.containsKey(key)){
-            folders[key].addAll(_tmpFolders[key]);
-          } else {
-            folders[key] = _tmpFolders[key];
-          }
+      for(final e in event){
+        final folderPath = e.substring(0, e.lastIndexOf('/'));
+        if(folders.containsKey(folderPath)){
+          folders[folderPath].add(e);
+        } else {
+          folders[folderPath] = [e];
         }
-        sortByName();
-        _tmpFolders.clear();
       }
+      sortByName();
     },
         onDone: () {
-          for(final key in _tmpFolders.keys){
-            if(folders.containsKey(key)){
-              folders[key].addAll(_tmpFolders[key]);
-            } else {
-              folders[key] = _tmpFolders[key];
-            }
-          }
           sortByName();
-          _tmpFolders.clear();
         }
     );
   }

@@ -38,14 +38,14 @@ class PathDao extends DatabaseAccessor<Database> with _$PathDaoMixin {
 
   Future addItem(String item) async {
     final folder = item.substring(0, item.lastIndexOf('/'));
-    into(paths).insertOnConflictUpdate(Path(fullPath: item, folder: folder));
+    into(paths).insertOnConflictUpdate(Path(fullPath: item));
   }
 
   Future addItems(List<String> items) async {
     await batch((batch){
       batch.insertAll(paths, [
         for(final i in items)
-          PathsCompanion(fullPath: Value(i), folder: Value(i.substring(0, i.lastIndexOf('/'))))
+          PathsCompanion(fullPath: Value(i))
       ]);
     });
   }

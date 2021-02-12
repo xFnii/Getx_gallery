@@ -1,1 +1,7 @@
 include: package:lint/analysis_options.yaml
+
+analyzer:
+  errors:
+    argument_type_not_assignable: false
+    invalid_assignment: false
+    return_of_invalid_type: false
