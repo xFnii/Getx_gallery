@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/utils/buffers/buffer.dart';
 import 'package:isolate_handler/isolate_handler.dart';
 
@@ -32,7 +33,8 @@ void entryPoint(Map<String, dynamic> context) {
     print('Start file indexing');
     final stopWatch = Stopwatch()..start();
     Directory(rooDir).list(recursive: true, followLinks: false).listen((event) {
-      if(event.path.contains(RegExp(r'\.(gif|jpe?g|tiff?|png|webp|bmp)$'))){
+      final file = C.fullPathToFile(event.path);
+      if(file.contains(RegExp(r'\.(gif|jpe?g|tiff?|png|webp|bmp)$'))){
         size++;
         if(!paths.contains(event.path)) {
           result.add(event.path);
@@ -42,6 +44,8 @@ void entryPoint(Map<String, dynamic> context) {
           messenger.send(result);
           result.clear();
         }
+      } else if (file.toLowerCase()=='.nomedia' || C.fullPathToFolder(event.path).contains('/.')){
+        messenger.send(event.path);
       }
     },
         onDone: ()

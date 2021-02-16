@@ -1,9 +1,10 @@
 
 import 'package:get/get.dart';
+import 'package:getx_gallery/data/entities/folder.dart';
 
 abstract class Repository {
   Future find();
-  MiniStream<List<String>> watchPaths();
-  Future<Map<String, List<String>>> getPaths();
+  MiniStream<List<Folder>> watchPaths();
+  Future<List<Folder>> getPaths();
   Future addPaths(List<String> paths);
 }

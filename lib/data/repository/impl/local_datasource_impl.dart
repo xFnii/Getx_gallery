@@ -12,10 +12,15 @@ class LocalDataSourceImpl implements LocalDataSource{
   @override
   Future<List<String>> getPaths() async => (await _db.pathDao.getAll()).map((e) => e.fullPath).toList();
 
+  @override
+  Future<List<Folder>> getFolders() async => _db.folderDao.getAll();
 
   @override
   Stream<String> watchPaths() => _db.pathDao.watch().map((event) => event.fullPath);
 
   @override
   Future addPaths(List<String> paths) => _db.pathDao.addItems(paths);
+
+  @override
+  Future addHiddenPath(String paths) => _db.pathDao.addItems(paths);
 }

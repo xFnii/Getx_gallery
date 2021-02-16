@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/presentation/full_image_screen/screens/full_image_screen.dart';
 import 'package:getx_gallery/presentation/open_folder_screen/controllers/open_folder_controller.dart';
+import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/resources/enums/sort_types.dart';
 
 class OpenFolderScreen extends StatelessWidget{
@@ -30,6 +31,10 @@ class OpenFolderScreen extends StatelessWidget{
                   child: Text('Date'),
                 ),
                 const PopupMenuItem(
+                  value: SortTypes.size,
+                  child: Text('Size'),
+                ),
+                const PopupMenuItem(
                   value: SortTypes.random,
                   child: Text('RND'),
                 ),
@@ -51,7 +56,7 @@ class OpenFolderScreen extends StatelessWidget{
           ),
           labelTextBuilder: (double offset) =>
               Text(
-                c.images[offset ~/ 100].path.substring(c.images[offset ~/ 100].path.lastIndexOf('/')+1, c.images[offset ~/ 100].path.length),
+                C.fullPathToFile(c.images[offset ~/ 100]),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 textAlign: TextAlign.center,
                 maxLines: 2,

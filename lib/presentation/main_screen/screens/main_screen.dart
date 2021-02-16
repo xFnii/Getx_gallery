@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/presentation/main_screen/controllers/main_screen_controller.dart';
 import 'package:getx_gallery/presentation/open_folder_screen/screens/open_folder_screen.dart';
+import 'package:getx_gallery/resources/converter.dart';
 
 class MainScreen extends StatelessWidget{
 
@@ -32,7 +33,7 @@ class MainScreen extends StatelessWidget{
           ),
           labelTextBuilder: (double offset) =>
               Text(
-                c.keys[offset ~/ 100].substring(c.keys[offset ~/ 100].lastIndexOf('/')+1, c.keys[offset ~/ 100].length),
+                C.fullPathToFile(c.keys[offset ~/ 100]),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 textAlign: TextAlign.center,
                 maxLines: 2,

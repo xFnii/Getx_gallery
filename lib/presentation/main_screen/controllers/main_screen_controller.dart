@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
+import 'package:getx_gallery/resources/converter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -31,7 +32,7 @@ class MainScreenController extends GetxController{
   }
 
   void sortByName(){
-    keys.replaceRange(0, keys.length, folders.keys.toList()..sort((a,b)=>a.substring(a.lastIndexOf('/')+1, a.length).toLowerCase().compareTo(b.substring(b.lastIndexOf('/')+1, b.length).toLowerCase())));
+    keys.replaceRange(0, keys.length, folders.keys.toList()..sort((a,b)=>C.fullPathToFile(a).toLowerCase().compareTo(C.fullPathToFile(a).toLowerCase())));
   }
 
   void find() async => _repo.find();
@@ -39,7 +40,7 @@ class MainScreenController extends GetxController{
   void _listenPathStream(){
     _repo.watchPaths().listen((event) {
       for(final e in event){
-        final folderPath = e.substring(0, e.lastIndexOf('/'));
+        final folderPath = C.fullPathToFolder(e);
         if(folders.containsKey(folderPath)){
           folders[folderPath].add(e);
         } else {
