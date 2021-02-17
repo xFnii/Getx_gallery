@@ -24,6 +24,7 @@ dependencies:
   permission_handler: ^5.1.0+2
   path_provider_ex: ^1.0.1
   draggable_scrollbar: ^0.0.4
+  moor_db_viewer: ^2.0.3
   flutter_image_compress: ^0.7.0
   isolate_handler: ^0.3.1
   flutter:

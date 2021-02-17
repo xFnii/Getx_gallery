@@ -11,6 +11,14 @@ class OpenFolderScreenController extends GetxController{
   final images = <File>[].obs;
   final Map<SortTypes, bool> _sortFlags = {SortTypes.name: false, SortTypes.date: false, SortTypes.size: false};
 
+  @override
+  void onInit() {
+    for(final e in Get.arguments as List<String>){
+      images.add(File(e));
+    }
+    super.onInit();
+  }
+
   void shuffle(){
     images.shuffle();
   }
@@ -44,12 +52,6 @@ class OpenFolderScreenController extends GetxController{
         }
         _sortFlags[type]=!_sortFlags[type];
         break;
-    }
-  }
-
-  void convertStringsToFiles(List<String> list){
-    for(final e in list){
-      images.add(File(e));
     }
   }
 }

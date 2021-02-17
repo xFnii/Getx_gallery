@@ -3,7 +3,7 @@ import 'package:moor/moor.dart';
 
 class Folders extends Table {
   TextColumn get path => text()();
-  TextColumn get hidden => boolean().withDefault(Constant(false))();
-  IntColumn get sortType => intEnum<SortTypes>().withDefault(Constant(SortTypes.name))();
+  BoolColumn get hide => boolean().withDefault(Constant(false))();
+  IntColumn get sortType => intEnum<SortTypes>().withDefault(Constant(0))();
   Set<Column> get primaryKey => {path};
 }

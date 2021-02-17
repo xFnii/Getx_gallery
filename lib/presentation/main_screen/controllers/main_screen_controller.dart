@@ -1,24 +1,23 @@
 import 'package:get/get.dart';
+import 'package:getx_gallery/data/entities/folder.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:photo_manager/photo_manager.dart';
 
 class MainScreenController extends GetxController{
 
 
   final Repository _repo = Get.find();
-  final paths = <String>[].obs;
 
-  final folders = <String, List<String>>{}.obs;
-
-  final keys = <String>[].obs;
-
+  var _showHidden = false;
+  final folders = <Folder>[].obs;
+  final _allOrders = <Folder>[];
 
   @override
   Future onInit() async{
+    _allOrders.addAll(await _repo.getPaths());
+    folders.addAll(_allOrders.where((element) => !element.hidden).toList());
     _listenPathStream();
-    folders.addAll(await _repo.getPaths());
     sortByName();
     super.onInit();
   }
@@ -31,21 +30,38 @@ class MainScreenController extends GetxController{
     super.onReady();
   }
 
-  void sortByName(){
-    keys.replaceRange(0, keys.length, folders.keys.toList()..sort((a,b)=>C.fullPathToFile(a).toLowerCase().compareTo(C.fullPathToFile(a).toLowerCase())));
+  void toggleHidden(){
+    _showHidden = !_showHidden;
+    folders.clear();
+    if(_showHidden){
+      folders.addAll(_allOrders);
+    } else {
+      folders.addAll(_allOrders.where((element) => !element.hidden).toList());
+    }
+    sortByName();
   }
 
-  void find() async => _repo.find();
+  void deleteAll(){
+    folders.clear();
+    _allOrders.clear();
+    _repo.deleteAll();
+  }
+
+  void sortByName(){
+    folders.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+  }
+
+  Future find() async => _repo.find();
 
   void _listenPathStream(){
     _repo.watchPaths().listen((event) {
-      for(final e in event){
-        final folderPath = C.fullPathToFolder(e);
-        if(folders.containsKey(folderPath)){
-          folders[folderPath].add(e);
-        } else {
-          folders[folderPath] = [e];
-        }
+      _allOrders.clear();
+      _allOrders.addAll(event);
+      folders.clear();
+      if(_showHidden){
+        folders.addAll(_allOrders);
+      } else {
+        folders.addAll(_allOrders.where((element) => !element.hidden).toList());
       }
       sortByName();
     },

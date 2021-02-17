@@ -4,9 +4,11 @@ import 'dart:ui';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getx_gallery/data/db/database.dart';
 import 'package:getx_gallery/presentation/main_screen/controllers/main_screen_controller.dart';
 import 'package:getx_gallery/presentation/open_folder_screen/screens/open_folder_screen.dart';
 import 'package:getx_gallery/resources/converter.dart';
+import 'package:moor_db_viewer/moor_db_viewer.dart';
 
 class MainScreen extends StatelessWidget{
 
@@ -19,7 +21,17 @@ class MainScreen extends StatelessWidget{
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(icon: Icon(Icons.storage), onPressed: ()=> Get.to(MoorDbViewer(Get.find<Database>()))),
+          IconButton(icon: Icon(Icons.delete), onPressed: ()=> c.deleteAll()),
+          IconButton(icon: Icon(Icons.sync), onPressed: ()=> c.find()),
+          IconButton(icon: Icon(Icons.remove_red_eye), onPressed: (){
+            c.toggleHidden();
+            _controller.jumpTo(_controller.initialScrollOffset);
+          }),
+        ],
+      ),
       body: _buildGrid(),
     );
   }
@@ -33,7 +45,7 @@ class MainScreen extends StatelessWidget{
           ),
           labelTextBuilder: (double offset) =>
               Text(
-                C.fullPathToFile(c.keys[offset ~/ 100]),
+                C.fullPathToFile(c.folders[offset ~/ 100].name),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -46,17 +58,16 @@ class MainScreen extends StatelessWidget{
                 crossAxisCount: 2
             ),
             itemBuilder: _buildItem,
-            itemCount: c.folders.keys.length,
+            itemCount: c.folders.length,
           ),
         )
     );
   }
 
   Widget _buildItem(BuildContext context, int index){
-    final folder = c.keys[index];
     return GestureDetector(
       onTap: (){
-        Get.toNamed(OpenFolderScreen.route, arguments: c.folders[folder]);
+        Get.toNamed(OpenFolderScreen.route, arguments: c.folders[index].paths);
       },
       child: Stack(
         children: [
@@ -66,7 +77,7 @@ class MainScreen extends StatelessWidget{
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: FileImage(File(c.folders[folder][0]))
+                image: FileImage(File(c.folders[index].paths[0]))
               )
             ),
           ),
@@ -79,7 +90,7 @@ class MainScreen extends StatelessWidget{
               height: 130/4,
               color: Colors.black.withOpacity(0.8),
               child: Text(
-                folder.substring(folder.lastIndexOf('/')+1, folder.length),
+                C.fullPathToFile(c.folders[index].name),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white),
                 overflow: TextOverflow.ellipsis, maxLines: 2,)

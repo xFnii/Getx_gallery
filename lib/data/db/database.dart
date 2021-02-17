@@ -30,6 +30,11 @@ class Database extends _$Database {
   // are covered later in this readme.
   @override
   int get schemaVersion => 1;
+
+  Future deleteAll() async {
+    await delete(folders).go();
+    await delete(paths).go();
+  }
 }
 
 
@@ -51,13 +56,13 @@ class PathDao extends DatabaseAccessor<Database> with _$PathDaoMixin {
       ]);
       batch.insertAllOnConflictUpdate(folders, [
         for(final i in items)
-          FoldersCompanion(path: C.fullPathToFolder(i), sortType: SortTypes.name)
+          FoldersCompanion(path: Value(C.fullPathToFolder(i)), sortType: Value(SortTypes.name))
       ]);
     });
   }
 
 
-  Future<List<Paths>> getAll() async {
+  Future<List<Path>> getAll() async {
     return select(paths).get();
   }
 
@@ -71,8 +76,13 @@ class FolderDao extends DatabaseAccessor<Database> with _$PathDaoMixin {
 
   FolderDao(Database attachedDatabase) : super(attachedDatabase);
 
-  Future addHiddenPath(String item) async {
-    into(folders).insertOnConflictUpdate(Folder(path: C.fullPathToFolder(item), hidden: true));
+  Future addHiddenFolders(List<String> items) async {
+    await batch((batch) {
+      batch.insertAllOnConflictUpdate(folders, [
+        for(final i in items)
+          FoldersCompanion(path: Value(i), hide: Value(true))
+      ]);
+    });
   }
 
 

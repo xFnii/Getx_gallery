@@ -7,4 +7,7 @@ abstract class Repository {
   MiniStream<List<Folder>> watchPaths();
   Future<List<Folder>> getPaths();
   Future addPaths(List<String> paths);
+  Future addHiddenFolders(List<String> paths);
+  Future deleteAll();
+  Future findHandler(Map<String, List<String>> data);
 }

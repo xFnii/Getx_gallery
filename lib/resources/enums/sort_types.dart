@@ -1,6 +1,6 @@
 enum SortTypes{
+  name,
   date,
   size,
-  name,
   random
 }

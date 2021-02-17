@@ -22,5 +22,8 @@ class LocalDataSourceImpl implements LocalDataSource{
   Future addPaths(List<String> paths) => _db.pathDao.addItems(paths);
 
   @override
-  Future addHiddenPath(String paths) => _db.pathDao.addItems(paths);
+  Future addHiddenFolders(List<String> paths) => _db.folderDao.addHiddenFolders(paths);
+
+  @override
+  Future deleteAll() => _db.deleteAll();
 }

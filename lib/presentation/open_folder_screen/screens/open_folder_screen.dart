@@ -15,7 +15,6 @@ class OpenFolderScreen extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    c.convertStringsToFiles(Get.arguments as List<String>);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -56,7 +55,7 @@ class OpenFolderScreen extends StatelessWidget{
           ),
           labelTextBuilder: (double offset) =>
               Text(
-                C.fullPathToFile(c.images[offset ~/ 100]),
+                C.fullPathToFile(c.images[offset ~/ 100].path),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -78,7 +77,7 @@ class OpenFolderScreen extends StatelessWidget{
 
   Widget _buildItem(BuildContext context, int index){
     return GestureDetector(
-      onTap: () => Get.to(FullImageScreen(images: c.images, initialPage: index)),
+      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images':c.images, 'initialPage': index}),
       child: Container(
         margin: const EdgeInsets.all(1),
         alignment: Alignment.center,
