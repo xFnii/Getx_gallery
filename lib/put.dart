@@ -1,14 +1,14 @@
-import 'package:get/get.dart';
-import 'package:getx_gallery/data/db/database.dart';
-import 'package:getx_gallery/data/repository/impl/local_datasource_impl.dart';
+import 'package:get/instance_manager.dart';
+import 'package:getx_gallery/data/databases/hive_db/database.dart';
+import 'package:getx_gallery/data/repository/impl/local_datasource_hive.dart';
 import 'package:getx_gallery/data/repository/impl/repository_impl.dart';
 import 'package:getx_gallery/data/repository/local_datasource.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
-import 'package:getx_gallery/utils/profiler.dart';
+import 'package:isolate_handler/isolate_handler.dart';
 
 void put(){
-  Get.lazyPut<Database>(() => Database());
-  Get.lazyPut<LocalDataSource>(() => LocalDataSourceImpl());
+  Get.lazyPut<IsolateHandler>(() => IsolateHandler());
+  Get.put<HiveDB>(HiveDB());
+  Get.lazyPut<LocalDataSource>(() => LocalDataSourceHive(Get.find<HiveDB>()));
   Get.lazyPut<Repository>(() => RepositoryImpl());
-  Get.put<Map<String, Profiler>>({'dir.liten': Profiler()});
 }

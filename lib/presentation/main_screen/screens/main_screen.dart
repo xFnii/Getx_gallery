@@ -4,11 +4,9 @@ import 'dart:ui';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_gallery/data/db/database.dart';
 import 'package:getx_gallery/presentation/main_screen/controllers/main_screen_controller.dart';
 import 'package:getx_gallery/presentation/open_folder_screen/screens/open_folder_screen.dart';
 import 'package:getx_gallery/resources/converter.dart';
-import 'package:moor_db_viewer/moor_db_viewer.dart';
 
 class MainScreen extends StatelessWidget{
 
@@ -23,10 +21,9 @@ class MainScreen extends StatelessWidget{
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(icon: Icon(Icons.storage), onPressed: ()=> Get.to(MoorDbViewer(Get.find<Database>()))),
-          IconButton(icon: Icon(Icons.delete), onPressed: ()=> c.deleteAll()),
-          IconButton(icon: Icon(Icons.sync), onPressed: ()=> c.find()),
-          IconButton(icon: Icon(Icons.remove_red_eye), onPressed: (){
+          IconButton(icon: const Icon(Icons.delete), onPressed: ()=> c.deleteAll()),
+          IconButton(icon: const Icon(Icons.sync), onPressed: ()=> c.find()),
+          IconButton(icon: const Icon(Icons.remove_red_eye), onPressed: (){
             c.toggleHidden();
             _controller.jumpTo(_controller.initialScrollOffset);
           }),
