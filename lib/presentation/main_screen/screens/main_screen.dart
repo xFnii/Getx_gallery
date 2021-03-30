@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getx_gallery/presentation/common/draggable_scrollbar.dart';
 import 'package:getx_gallery/presentation/main_screen/controllers/main_screen_controller.dart';
 import 'package:getx_gallery/presentation/open_folder_screen/screens/open_folder_screen.dart';
 import 'package:getx_gallery/resources/converter.dart';

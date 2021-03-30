@@ -8,8 +8,8 @@ class FullImageScreenController extends GetxController{
 
   @override
   void onInit() {
-    initialPage.value= currentIdx.value =Get.arguments['initialPage'];
-    images.addAll(Get.arguments['images']);
+    initialPage.value = currentIdx.value = Get.arguments['initialPage'] as int;
+    images.addAll(Get.arguments['images'] as List<File>);
     super.onInit();
   }
 }

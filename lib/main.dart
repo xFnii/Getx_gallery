@@ -15,7 +15,7 @@ import 'put.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Hive.initFlutter();
+  await Hive.initFlutter();
   put();
   runApp(GetMaterialApp(
     initialRoute: MainScreen.route,

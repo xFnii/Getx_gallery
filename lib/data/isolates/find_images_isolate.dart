@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
-import 'package:getx_gallery/data/databases/models/folder.dart';
+import 'package:getx_gallery/data/entities/folder.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/resources/enums/sort_types.dart';
 import 'package:isolate_handler/isolate_handler.dart';
@@ -10,7 +10,7 @@ final IsolateHandler isolates = Get.find();
 
 
 
-Future findImageIsolate({String rootDir, Function callback}) async {
+Future findImageIsolate({required String rootDir, required Function callback}) async {
   isolates.kill('findImages');
   isolates.spawn(
       getFolders,
@@ -19,7 +19,7 @@ Future findImageIsolate({String rootDir, Function callback}) async {
         callback(data);
         isolates.kill('findImages');
       },
-      onInitialized: ()=> isolates.send({'rootDir': rootDir}, to: 'findImages')
+      onInitialized: ()=> isolates.send(rootDir, to: 'findImages')
   );
 }
 
@@ -27,7 +27,7 @@ void getFolders(Map<String, dynamic> context) {
   final messenger = HandledIsolate.initialize(context);
 
   messenger.listen((data) {
-    final String rootDir = data['rootDir'];
+    final String rootDir = data as String;
     //final result = <Folder>[];
 
     int size=0;

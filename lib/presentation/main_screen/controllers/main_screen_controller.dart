@@ -48,7 +48,7 @@ class MainScreenController extends GetxController{
     _repo.deleteAll();
   }
 
-  void sortByName({List<Folder> list}){
+  void sortByName({List<Folder>? list}){
     if (list == null){
       folders.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
     } else {

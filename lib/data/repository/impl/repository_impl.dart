@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
+import 'package:getx_gallery/data/databases/models/db_models.dart' as db_models;
 import 'package:getx_gallery/data/isolates/find_images_isolate.dart';
 import 'package:getx_gallery/data/repository/local_datasource.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
@@ -14,7 +14,7 @@ class RepositoryImpl implements Repository{
   final _foldersStream = MiniStream<Folder>();
   List<Folder> _folders = [];
 
-  RepositoryImpl({LocalDataSource localDataSource}):
+  RepositoryImpl({required LocalDataSource localDataSource}):
         _localDataSource=localDataSource;
 
 
@@ -43,9 +43,9 @@ class RepositoryImpl implements Repository{
   }
 
   Future resultHandler(String data) async {
-    final Folder result = jsonDecode(data);
+    final result = Folder.fromJson(jsonDecode(data));
     _foldersStream.add(result);
-    _localDataSource.addFolder(result);
+    _localDataSource.addFolder(db_models.Folder.fromEntity(result));
   }
 
   @override

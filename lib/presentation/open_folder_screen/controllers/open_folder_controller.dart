@@ -17,7 +17,8 @@ class OpenFolderScreenController extends GetxController{
   }
 
   void sort(SortTypes type){
-    if(!_sortFlags[type]) {
+    final bool flag = _sortFlags[type] ?? false;
+    if(!flag) {
       sortIsolate(images, type, _sortHandler);
       _switchFlag(type);
     } else {

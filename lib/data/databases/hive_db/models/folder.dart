@@ -12,5 +12,5 @@ class Folder{
   @HiveField(2)
   SortTypes sortType;
 
-  Folder({this.paths, this.hidden, this.sortType});
+  Folder({required this.paths, this.sortType = SortTypes.name, this.hidden = false});
 }

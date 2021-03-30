@@ -25,14 +25,9 @@ class HiveDB {
     final keys = foldersBox.keys;
     return [
       for(final key in keys)
-        db_model.Folder.fromHive(foldersBox.get(key), key)
+        db_model.Folder.fromHive(foldersBox.get(key) ?? Folder(paths: []), key as String)
     ];
   }
-
-  Stream<List<db_model.Folder>> watchFolders()=>
-    Hive.box(_folderTag).watch().map((event) => [
-      db_model.Folder.fromHive(event.value, event.key)
-    ]);
 
   Future deleteAll() async {
     await Hive.box(_folderTag).deleteFromDisk();

@@ -8,11 +8,11 @@ final IsolateHandler isolates = Get.find();
 
 void sortIsolate(List<File> files, SortTypes type, Function callback) async {
   final isolateName = '${type.toString()}_${files.hashCode}';
-  isolates.spawn(
+  isolates.spawn<List<String>>(
       entryPoint,
       name: isolateName,
       onReceive: (data) {
-        callback(List<File>.from(data.map((e) => File(e)).toList()));
+        callback(List<File>.from(data.map((e) => File(e))));
         isolates.kill(isolateName);
       },
       onInitialized: ()=> isolates.send({'files': files.map((e) => e.path).toList(), 'type': type.index}, to: isolateName)
@@ -22,8 +22,8 @@ void sortIsolate(List<File> files, SortTypes type, Function callback) async {
 void entryPoint(Map<String, dynamic> context) {
   final messenger = HandledIsolate.initialize(context);
   messenger.listen((data) {
-    final List<File> files = List<File>.from(data['files'].map((e) => File(e)));
-    final SortTypes type = SortTypes.values[data['type']];
+    final files = List<File>.from((data['files'] as Iterable).map((e) => File(e as String))).toList();
+    final type = SortTypes.values[data['type'] as int];
     switch(type) {
       case SortTypes.date:
         files.sort((a,b)=> a.statSync().changed.compareTo(b.statSync().changed));
