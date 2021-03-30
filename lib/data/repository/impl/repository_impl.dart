@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:get/get.dart';
@@ -5,30 +6,26 @@ import 'package:getx_gallery/data/entities/folder.dart';
 import 'package:getx_gallery/data/isolates/find_images_isolate.dart';
 import 'package:getx_gallery/data/repository/local_datasource.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
-import 'package:getx_gallery/resources/converter.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
 
 class RepositoryImpl implements Repository{
-  final LocalDataSource _localDataSource = Get.find<LocalDataSource>();
+  final LocalDataSource _localDataSource;
 
-  final _foldersStream = MiniStream<List<Folder>>();
+  final _foldersStream = MiniStream<Folder>();
   List<Folder> _folders = [];
+
+  RepositoryImpl({LocalDataSource localDataSource}):
+        _localDataSource=localDataSource;
 
 
   @override
-  MiniStream<List<Folder>> watchPaths() => _foldersStream;
+  MiniStream<Folder> watchPaths() => _foldersStream;
 
 
 
   @override
   Future<List<Folder>> getPaths() async {
-    //final folders = await _localDataSource.getFolders();
-    //final hiddenFolders = folders.where((element) => element.hide).toList();
-    //final paths = await _localDataSource.getPaths();
-    //return _folders = [
-    //  for(final e in folders)
-    //    Folder(name: e.path, paths: paths.where((element) => C.fullPathToFolder(element)==e.path).toList(), hidden: e.hide || hiddenFolders.indexWhere((element) => e.path.contains(element.path))!=-1)
-    //];
+    return _folders = (await _localDataSource.getFolders()).map((e) => e.toEntities()).toList();
   }
 
   @override
@@ -39,20 +36,16 @@ class RepositoryImpl implements Repository{
     final storageInfo = await PathProviderEx.getStorageInfo();
     for(final e in storageInfo){
       findImageIsolate(
-          [for(final e in _folders) ...e.paths],
-          _folders.where((element) => element.hidden).map((e) => e.name).toList(),
-          e.rootDir,
-          (data) => findHandler(data)
+          rootDir: e.rootDir,
+          callback: resultHandler
       );
     }
   }
 
-  @override
-  Future findHandler(Map<String, List<String>> data) async {
-    //addPaths(data['paths']);
-    //addHiddenFolders(data['folders']);
-    await getPaths();
-    _foldersStream.add(_folders);
+  Future resultHandler(String data) async {
+    final Folder result = jsonDecode(data);
+    _foldersStream.add(result);
+    _localDataSource.addFolder(result);
   }
 
   @override

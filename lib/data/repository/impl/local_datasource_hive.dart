@@ -19,6 +19,11 @@ class LocalDataSourceHive extends LocalDataSource{
   }
 
   @override
+  Future addFolder(Folder folder) {
+    return _hiveDB.addFolder(folder);
+  }
+
+  @override
   Future deleteAll() {
     return _hiveDB.deleteAll();
   }

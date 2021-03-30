@@ -7,6 +7,7 @@ abstract class LocalDataSource{
   Future<List<String>> getPaths();
   Future<List<Folder>> getFolders();
   Future addFolders(List<Folder> folders);
+  Future addFolder(Folder folder);
   Future addPath(String path);
   Future addHiddenFolders(List<String> paths);
   Future addPaths(List<String> paths);

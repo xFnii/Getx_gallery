@@ -11,14 +11,15 @@ class MainScreenController extends GetxController{
 
   var _showHidden = false;
   final folders = <Folder>[].obs;
-  final _allOrders = <Folder>[];
+  final _allFolders = <Folder>[];
 
   @override
   Future onInit() async{
-    _allOrders.addAll(await _repo.getPaths());
-    folders.addAll(_allOrders.where((element) => !element.hidden).toList());
+    _allFolders.addAll(await _repo.getPaths());
+    final visibleFolders = _allFolders.where((element) => !element.hidden).toList();
+    sortByName(list: visibleFolders);
+    folders.addAll(visibleFolders);
     _listenPathStream();
-    sortByName();
     super.onInit();
   }
 
@@ -34,34 +35,41 @@ class MainScreenController extends GetxController{
     _showHidden = !_showHidden;
     folders.clear();
     if(_showHidden){
-      folders.addAll(_allOrders);
+      folders.addAll(_allFolders);
     } else {
-      folders.addAll(_allOrders.where((element) => !element.hidden).toList());
+      folders.addAll(_allFolders.where((element) => !element.hidden).toList());
     }
     sortByName();
   }
 
   void deleteAll(){
     folders.clear();
-    _allOrders.clear();
+    _allFolders.clear();
     _repo.deleteAll();
   }
 
-  void sortByName(){
-    folders.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+  void sortByName({List<Folder> list}){
+    if (list == null){
+      folders.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+    } else {
+      list.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+    }
   }
 
   Future find() async => _repo.find();
 
   void _listenPathStream(){
     _repo.watchPaths().listen((event) {
-      _allOrders.clear();
-      _allOrders.addAll(event);
-      folders.clear();
+      final folderPosition = _allFolders.indexWhere((element) => element.name==event.name);
+      if(folderPosition!=-1){
+        _allFolders.removeAt(folderPosition);
+        folders.removeWhere((element) => element.name==event.name);
+      }
+      _allFolders.add(event);
       if(_showHidden){
-        folders.addAll(_allOrders);
-      } else {
-        folders.addAll(_allOrders.where((element) => !element.hidden).toList());
+        folders.add(event);
+      } else if(!event.hidden) {
+        folders.add(event);
       }
       sortByName();
     },

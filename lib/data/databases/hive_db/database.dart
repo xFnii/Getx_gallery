@@ -14,6 +14,12 @@ class HiveDB {
     foldersBox.close();
   }
 
+  Future addFolder(db_model.Folder folder) async {
+    final foldersBox = await Hive.openBox<Folder>(_folderTag);
+    foldersBox.put(folder.name, folder.toHive());
+    foldersBox.close();
+  }
+
   Future<List<db_model.Folder>> getFolders() async {
     final foldersBox = await Hive.openBox<Folder>(_folderTag);
     final keys = foldersBox.keys;

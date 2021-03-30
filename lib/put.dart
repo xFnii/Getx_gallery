@@ -10,5 +10,5 @@ void put(){
   Get.lazyPut<IsolateHandler>(() => IsolateHandler());
   Get.put<HiveDB>(HiveDB());
   Get.lazyPut<LocalDataSource>(() => LocalDataSourceHive(Get.find<HiveDB>()));
-  Get.lazyPut<Repository>(() => RepositoryImpl());
+  Get.lazyPut<Repository>(() => RepositoryImpl(localDataSource: Get.find<LocalDataSource>()));
 }
