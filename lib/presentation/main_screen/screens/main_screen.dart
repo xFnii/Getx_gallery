@@ -10,22 +10,21 @@ import 'package:getx_gallery/resources/converter.dart';
 
 class MainScreen extends StatelessWidget{
 
-  final MainScreenController c = Get.find();
-  final ScrollController _controller = ScrollController();
+  final MainScreenController _c = Get.find();
+  final ScrollController _scrollController = ScrollController();
 
   static String route = '/main';
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(icon: const Icon(Icons.delete), onPressed: ()=> c.deleteAll()),
-          IconButton(icon: const Icon(Icons.sync), onPressed: ()=> c.find()),
-          IconButton(icon: const Icon(Icons.remove_red_eye), onPressed: (){
-            c.toggleHidden();
-            _controller.jumpTo(_controller.initialScrollOffset);
+          IconButton(icon: const Icon(Icons.delete), onPressed: ()=> _c.deleteAll()),
+          IconButton(icon: const Icon(Icons.sync), onPressed: ()=> _c.find()),
+          IconButton(icon: Obx(()=>_c.showHidden.value? const Icon(Icons.remove_red_eye_outlined):const Icon(Icons.remove_red_eye)), onPressed: (){
+            _c.toggleHidden();
+            _scrollController.jumpTo(_scrollController.initialScrollOffset);
           }),
         ],
       ),
@@ -42,20 +41,20 @@ class MainScreen extends StatelessWidget{
           ),
           labelTextBuilder: (double offset) =>
               Text(
-                C.fullPathToFile(c.folders[offset ~/ 100].name),
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                C.fullPathToFile(_c.getScrollText(offset)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-          controller: _controller,
+          controller: _scrollController,
           child: GridView.builder(
-            controller: _controller,
+            controller: _scrollController,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2
             ),
             itemBuilder: _buildItem,
-            itemCount: c.folders.length,
+            itemCount: _c.folders.length,
           ),
         )
     );
@@ -64,7 +63,7 @@ class MainScreen extends StatelessWidget{
   Widget _buildItem(BuildContext context, int index){
     return GestureDetector(
       onTap: (){
-        Get.toNamed(OpenFolderScreen.route, arguments: c.folders[index].paths);
+        Get.toNamed(OpenFolderScreen.route, arguments: _c.folders[index]);
       },
       child: Stack(
         children: [
@@ -74,20 +73,20 @@ class MainScreen extends StatelessWidget{
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: FileImage(File(c.folders[index].paths[0]))
+                image: FileImage(File(_c.folders[index].paths[0]))
               )
             ),
           ),
           Positioned(
             bottom: 0,
-            left: 1,
+            left: 0,
             right: 1,
             child: Container(
               alignment: Alignment.center,
               height: 130/4,
               color: Colors.black.withOpacity(0.8),
               child: Text(
-                C.fullPathToFile(c.folders[index].name),
+                C.fullPathToFile(_c.folders[index].name),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white),
                 overflow: TextOverflow.ellipsis, maxLines: 2,)

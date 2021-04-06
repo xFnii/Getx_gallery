@@ -9,18 +9,33 @@ class LocalDataSourceHive extends LocalDataSource{
   LocalDataSourceHive(this._hiveDB);
 
   @override
-  Future<List<Folder>> getFolders() {
+  List<Folder> getFolders() {
     return _hiveDB.getFolders();
   }
 
   @override
-  Future addFolders(List<Folder> folders) {
+  void addFolders(List<Folder> folders) {
     return _hiveDB.addFolders(folders);
   }
 
   @override
-  Future addFolder(Folder folder) {
+  void addFolder(Folder folder) {
     return _hiveDB.addFolder(folder);
+  }
+
+  @override
+  void updateFolder(Folder folder) {
+    return _hiveDB.updateFolder(folder);
+  }
+
+  @override
+  void actualizeFolder(Folder folder) {
+    return _hiveDB.actualizeFolder(folder);
+  }
+
+  @override
+  void deleteFolder(Folder folder) {
+    return _hiveDB.deleteFolder(folder.name.hashCode);
   }
 
   @override
@@ -29,35 +44,7 @@ class LocalDataSourceHive extends LocalDataSource{
   }
 
   @override
-  Future addHiddenFolders(List<String> paths) {
-    // TODO: implement addHiddenFolders
-    throw UnimplementedError();
+  Stream<Folder> watchFolders() {
+    return _hiveDB.watchFolder().map((event) => Folder.fromHive(event));
   }
-
-  @override
-  Future addPath(String path) {
-    // TODO: implement addPath
-    throw UnimplementedError();
-  }
-
-  @override
-  Future addPaths(List<String> paths) {
-    // TODO: implement addPaths
-    throw UnimplementedError();
-  }
-
-
-  @override
-  Future<List<String>> getPaths() {
-    // TODO: implement getPaths
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<String> watchPaths() {
-    // TODO: implement watchPaths
-    throw UnimplementedError();
-  }
-
-
 }

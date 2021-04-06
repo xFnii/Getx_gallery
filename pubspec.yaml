@@ -23,12 +23,13 @@ environment:
 dependencies:
   permission_handler: ^6.1.1
   path_provider_ex:
-    path: "plugins/flutter_path_provider_ex"
-  hive: ^2.0.1
+    path: "plugins/path_provider_ex"
+  hive: ^2.0.2
   isolate_handler: ^1.0.0
   flutter:
     sdk: flutter
-  get: ^4.1.1
+  get: ^4.1.3
+  collection: ^1.15.0
   json_serializable: ^4.1.0
   photo_view: ^0.11.1
   path_provider: ^2.0.1
@@ -36,7 +37,7 @@ dependencies:
   hive_flutter: ^1.0.0
 
 dev_dependencies:
-  hive_generator: ^1.0.0
+  hive_generator: ^1.0.1
   lint: ^1.5.3
   build_runner: ^1.12.2
   flutter_test:
@@ -47,7 +48,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

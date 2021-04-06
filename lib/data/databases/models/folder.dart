@@ -8,10 +8,11 @@ class Folder{
   final bool hidden;
   final SortTypes sortType;
 
-  Folder({required this.name, required this.paths, required this.hidden, this.sortType = SortTypes.name});
+  Folder({required this.name, required this.paths, required this.hidden, required this.sortType });
 
-  Folder.fromHive(hive.Folder folder, this.name)
+  Folder.fromHive(hive.Folder folder)
       :
+        name = folder.name,
         paths = folder.paths,
         hidden = folder.hidden,
         sortType = folder.sortType;
@@ -20,18 +21,20 @@ class Folder{
       :
         paths = folder.paths,
         hidden = folder.hidden,
-        sortType = SortTypes.name,
+        sortType = folder.sortType,
         name = folder.name;
 
-  hive.Folder toHive() => hive.Folder(
-    paths: paths,
-    hidden: hidden,
-    sortType: sortType
+  hive.Folder toHive({String? name, List<String>? paths , SortTypes? sortType, bool? hidden}) => hive.Folder(
+      name: name ?? this.name,
+      paths: paths ?? this.paths,
+      sortType: sortType ?? this.sortType,
+      hidden: hidden ?? this.hidden
   );
 
   entities.Folder toEntities() => entities.Folder(
       name: name,
       paths: paths,
       hidden: hidden,
+      sortType: sortType
   );
 }
