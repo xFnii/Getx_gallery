@@ -18,7 +18,7 @@ class OpenFolderScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(C.fullPathToFile(_c.folder.value.name)),
+        title: Text(C.fullPathToFile(_c.folder.value.path)),
         actions: [
           PopupMenuButton(
               icon: const Icon(Icons.sort),
@@ -55,14 +55,6 @@ class OpenFolderScreen extends StatelessWidget{
             maxWidth: Get.width-60,
             maxHeight: 40,
           ),
-          // labelTextBuilder: (double offset) =>
-          //     Text(
-          //       C.fullPathToFile(_c.images[offset ~/ 100]),
-          //       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          //       textAlign: TextAlign.center,
-          //       maxLines: 2,
-          //       overflow: TextOverflow.ellipsis,
-          //     ),
           controller: _controller,
           child:
           GridView.builder(
@@ -71,25 +63,26 @@ class OpenFolderScreen extends StatelessWidget{
                 crossAxisCount: 3
             ),
             itemBuilder: _buildItem,
-            itemCount: _c.folder.value.paths.length,
+            itemCount: _c.folder.value.images.length,
           ),
         )
     );
   }
 
   Widget _buildItem(BuildContext context, int index){
+    final thumbnail = _c.getThumbnail(index);
     return GestureDetector(
-      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.paths, 'initialPage': index}),
-      child: Container(
+      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index}),
+      child:  (thumbnail.isNotEmpty)?  Container(
         margin: const EdgeInsets.all(1),
         alignment: Alignment.center,
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: FileImage(File(_c.folder.value.paths[index]))
+                image: (thumbnail.isNotEmpty) ? MemoryImage(thumbnail):  FileImage(File(_c.folder.value.images[index].path)) as  ImageProvider
             )
         ),
-      ),
+      ): const Center(child: Text('X')),
     );
   }
 }

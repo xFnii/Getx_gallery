@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:get/get.dart';
-import 'package:getx_gallery/data/entities/folder.dart';
+import 'package:getx_gallery/data/entities/entities.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/resources/excluded_folders.dart';
 import 'package:isolate_handler/isolate_handler.dart';
@@ -133,8 +134,8 @@ class FolderHelper{
   }
 
   Folder _toEntity()=> Folder(
-      name: currentFolder,
-      paths: paths,
+      path: currentFolder,
+      images: paths.map((e) => Image(path: e, thumbnail: Uint8List(0))).toList(),
       hidden: hidden
   );
 }

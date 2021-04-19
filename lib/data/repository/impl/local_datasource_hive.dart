@@ -14,6 +14,11 @@ class LocalDataSourceHive extends LocalDataSource{
   }
 
   @override
+  Folder getFolder(int name) {
+    return _hiveDB.getFolder(name);
+  }
+
+  @override
   void addFolders(List<Folder> folders) {
     return _hiveDB.addFolders(folders);
   }
@@ -25,17 +30,17 @@ class LocalDataSourceHive extends LocalDataSource{
 
   @override
   void updateFolder(Folder folder) {
-    return _hiveDB.updateFolder(folder);
+    return _hiveDB.addFolder(folder);
   }
 
   @override
   void actualizeFolder(Folder folder) {
-    return _hiveDB.actualizeFolder(folder);
+    return _hiveDB.addFolder(folder);
   }
 
   @override
   void deleteFolder(Folder folder) {
-    return _hiveDB.deleteFolder(folder.name.hashCode);
+    return _hiveDB.deleteFolder(folder.path.hashCode);
   }
 
   @override

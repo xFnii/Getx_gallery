@@ -8,7 +8,7 @@ final IsolateHandler isolates = Get.find();
 
 final stopWatch = Get.find<Stopwatch>();
 
-Future actualizerIsolate(List<Folder> folders, Function(List<String>) callback) async {
+Future actualizerIsolate(List<Folder> folders, Function(Folder?) callback) async {
   final isolateName = 'actualizer_${folders.hashCode}';
   print('START $isolateName');
   isolates.spawn(
@@ -18,37 +18,48 @@ Future actualizerIsolate(List<Folder> folders, Function(List<String>) callback) 
         if(data is bool){
           print('END $isolateName');
           isolates.kill(isolateName);
-        } else {
-          callback(data as List<String>);
+          callback(null);
+        } else if (data is List<int>){
+          final folder = folders[data[0]];
+          callback(folder.copyWith(images: [
+            for(int i = 1; i < data.length;i++)
+              folder.images[data[i]]
+          ]));
         }
       },
-      onInitialized: ()=> isolates.send(folders.map((e) => jsonEncode(e)).toList(), to: isolateName)
+      onInitialized: ()=> isolates.send({
+        for(final folder in folders)
+          folder.path:folder.images.map((e) => e.path).toList()
+      }
+      , to: isolateName)
   );
 }
 
 void entryPoint(Map<String, dynamic> context) {
   final messenger = HandledIsolate.initialize(context);
-  messenger.listen((jsonFolder) async {
-    final result = <String>[];
-    final List<Folder> folders = jsonFolder.map<Folder>((e) => Folder.fromJson(jsonDecode(e))).toList();
-    var buffer = 0;
-    for(final folder in folders){
-      buffer++;
-      if(!(await Directory(folder.name).exists())) {
-        result.add(jsonEncode(folder.copyWith(paths: [])));
-      } else {
-        for (final path in folder.paths) {
-          if (!(await File(path).exists())) {
-            folder.paths.remove(path);
+  messenger.listen((foldersMap) async {
+    final stopWatch = Stopwatch()..start();
+    print('${stopWatch.elapsedMilliseconds} ACTUALIZER START');
+    final result = <int>[];
+    final folders = foldersMap as Map<String, List<String>>;
+    print('${stopWatch.elapsedMilliseconds}DECODE FOLDERS');
+    var index = 0;
+    for(final key in folders.keys){
+      result.add(index);
+      index++;
+      print('${stopWatch.elapsedMilliseconds}ACTUALIZE ${key}');
+      final dir = Directory(key);
+      if(await dir.exists()) {
+        for (int i = 0; i<folders[key]!.length; i++ ) {
+          if (await File(folders[key]![i]).exists()) {
+            result.add(i);
           }
         }
-        result.add(jsonEncode(folder));
       }
-      if(buffer>10) {
-        messenger.send(result);
-        result.clear();
-        buffer = 0;
-      }
+      print('${stopWatch.elapsedMilliseconds}ACTUALIZE END ${key}');
+      messenger.send(result);
+      result.clear();
+      print('${stopWatch.elapsedMilliseconds}ACTUALIZE SEND BUFFER ${key}');
     }
     if(result.isNotEmpty){
       messenger.send(result);

@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
 import 'package:getx_gallery/data/databases/models/db_models.dart' as db_models;
 import 'package:getx_gallery/data/isolates/actualizer_isolate.dart';
+import 'package:getx_gallery/data/isolates/create_thumbnail_isolate.dart';
 import 'package:getx_gallery/data/isolates/find_images_isolate.dart';
+import 'package:getx_gallery/data/isolates/sorting_isolate_vanila.dart';
 import 'package:getx_gallery/data/repository/local_datasource.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
 import 'package:path_provider_ex/path_provider_ex.dart';
@@ -22,19 +26,22 @@ class RepositoryImpl implements Repository{
   @override
   Future getFolders() async {
     final folders = (_localDataSource.getFolders()).map((e) => e.toEntities()).toList();
-    folders.where((element) => element.name.contains('download'));
-    await actualizerIsolate(folders, _actualizerHandler).then((value) => find());
-
+    if(folders.isNotEmpty) {
+      actualizerIsolate(folders, _actualizerHandler);
+    } else {
+      find();
+    }
   }
 
-  Future _actualizerHandler(List<String> jsonFolder) async{
-    final folders = jsonFolder.map((e) => Folder.fromJson(jsonDecode(e))).toList();
-    for(final folder in folders) {
-      if (folder.paths.isEmpty) {
-        _localDataSource.deleteFolder(db_models.Folder.fromEntity(folder));
-      } else {
-        _localDataSource.actualizeFolder(db_models.Folder.fromEntity(folder));
-      }
+  void _actualizerHandler(Folder? folder) {
+    if(folder == null){
+      find();
+      return;
+    }
+    if (folder.images.isEmpty) {
+      _localDataSource.deleteFolder(db_models.Folder.fromEntity(folder));
+    } else {
+      _localDataSource.actualizeFolder(db_models.Folder.fromEntity(folder));
     }
   }
 
@@ -50,8 +57,21 @@ class RepositoryImpl implements Repository{
   }
 
   Future _findHandler(String jsonFolder) async {
-    final result = Folder.fromJson(jsonDecode(jsonFolder));
-    _localDataSource.addFolder(db_models.Folder.fromEntity(result));
+    final newFolder = Folder.fromJson(jsonDecode(jsonFolder));
+    final oldFolder = _localDataSource.getFolder(newFolder.path.hashCode);
+    if(oldFolder.path.isEmpty) {
+      _localDataSource.addFolder(db_models.Folder.fromEntity(newFolder));
+    } else {
+      if(!ListEquality().equals(newFolder.images, oldFolder.images)) {
+        compute(sortIsolate, {'images': newFolder.images.toList(), 'type': oldFolder.sortType.index}).then((value) async {
+          if(value[0].thumbnail.isEmpty != null){
+            print('thumb created ' + value[0].path);
+            compute(decodeIsolate, {'file': File(value[0].path), 'width': 540}).then((value) => value[0].thumbnail = value);
+          }
+          _localDataSource.addFolder(db_models.Folder.fromEntity(newFolder.copyWith(sortType: oldFolder.sortType, images: value)));
+        });
+      }
+    }
   }
 
   @override

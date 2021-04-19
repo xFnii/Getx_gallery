@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
+import 'package:getx_gallery/data/isolates/create_thumbnail_isolate.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
+import 'package:getx_gallery/presentation/common/controller/folder_controller.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -12,81 +18,77 @@ class MainScreenController extends GetxController{
 
   final showHidden = false.obs;
   final folders = <Folder>[].obs;
-  final _allFolders = <Folder>[];
+  final _executedThumbnailsPaths = <String>[];
+  final FolderController fc = Get.find();
+
 
   @override
   Future onInit() async{
-    _listenPathStream();
-    _repo.getFolders();
-    //_allFolders.addAll(await _repo.getFolders());
-    //final visibleFolders = _allFolders.where((element) => !element.hidden).toList();
-    //sortByName(list: visibleFolders);
-    //folders.addAll(visibleFolders);
+    ever(fc.folders, (_)=> _listenFolders());
     super.onInit();
   }
   @override
   Future onReady() async {
     if (!await Permission.storage.request().isGranted){
       Get.snackbar('permission_declined'.tr, 'next_time_accept'.tr, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+    } else {
+      _repo.getFolders();
     }
     super.onReady();
+  }
+
+  void _listenFolders(){
+    if(showHidden.value){
+      folders.value = fc.folders;
+    } else {
+      folders.value = fc.visibleFolders;
+    }
   }
 
   void toggleHidden(){
     showHidden.value = !showHidden.value;
     Get.snackbar(showHidden.value? 'hidden'.tr: 'shown'.tr, showHidden.value? 'folders_are_visible'.tr: 'folders_are_invisible'.tr, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 1, milliseconds: 500));
-    folders.clear();
     if(showHidden.value){
-      folders.addAll(_allFolders);
+      folders.value = fc.folders;
     } else {
-      folders.addAll(_allFolders.where((element) => !element.hidden).toList());
+      folders.value = fc.visibleFolders;
     }
-    sortByName();
   }
 
   void deleteAll(){
     folders.clear();
-    _allFolders.clear();
+    _executedThumbnailsPaths.clear();
     _repo.deleteAll();
   }
 
-  void sortByName({List<Folder>? list}){
-    if (list == null){
-      folders.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+  Uint8List getThumbnail(int index) {
+    final folder = folders[index];
+    final image = folder.images[0];
+    if(image.thumbnail.isEmpty && !_executedThumbnailsPaths.contains(image.path)){
+      _generateThumbnail(folder);
+      _executedThumbnailsPaths.add(image.path);
+      return Uint8List(0);
     } else {
-      list.sort((a,b) => C.fullPathToFile(a.name).toLowerCase().compareTo(C.fullPathToFile(b.name).toLowerCase()));
+      return image.thumbnail;
     }
+  }
+
+  Future _generateThumbnail(Folder folder) async {
+    compute(decodeIsolate, {'file': File(folder.images[0].path), 'width': 540}).then((value) {
+      print('thumb created ${folder.path}');
+      folder.addThumbnail(0, value);
+      _repo.updateFolder(folder);
+    });
   }
 
   Future find() async => _repo.find();
 
-  void _listenPathStream(){
-    _repo.watchFolders().listen((event) {
-      final folderPosition = _allFolders.indexWhere((element) => element.name==event.name);
-      if(folderPosition!=-1){
-        _allFolders.removeAt(folderPosition);
-        folders.removeWhere((element) => element.name==event.name);
-      }
-      _allFolders.add(event);
-      if(showHidden.value){
-        folders.add(event);
-      } else if(!event.hidden) {
-        folders.add(event);
-      }
-      sortByName();
-    },
-        onDone: () {
-          sortByName();
-        }
-    );
-  }
-
   String getScrollText(double offset){
     final pos = offset ~/ 100;
     if(pos == folders.length) {
-      return C.fullPathToFile(folders.last.name);
+      return C.fullPathToFile(folders.last.path);
     } else {
-      return C.fullPathToFile(folders[pos].name);
+      return C.fullPathToFile(folders[pos].path);
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:getx_gallery/data/entities/image.dart';
 
 class FullImageScreenController extends GetxController{
   final currentIdx = 0.obs;
@@ -9,7 +10,7 @@ class FullImageScreenController extends GetxController{
   @override
   void onInit() {
     initialPage.value = currentIdx.value = Get.arguments['initialPage'] as int;
-    images.addAll((Get.arguments['images'] as List<String>).map((e) => File(e)).toList());
+    images.addAll((Get.arguments['images'] as List<Image>).map((e) => File(e.path)).toList());
     super.onInit();
   }
 }
