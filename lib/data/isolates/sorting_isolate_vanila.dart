@@ -10,11 +10,11 @@ sortIsolate(data) async {
   switch(type) {
     case SortTypes.date:
       final sortingList = images.map((e) => SortingAdapter(e, File(e.path).statSync())).toList();
-      sortingList.sort((a,b)=> a.fileStat.changed.compareTo(b.fileStat.changed));
+      sortingList.sort((a,b)=> a.fileStat.modified.compareTo(b.fileStat.modified));
       return sortingList.map((e) => e.image).toList();
     case SortTypes.reverseDate:
       final sortingList = images.map((e) => SortingAdapter(e, File(e.path).statSync())).toList();
-      sortingList.sort((b,a)=> a.fileStat.changed.compareTo(b.fileStat.changed));
+      sortingList.sort((b,a)=> a.fileStat.modified.compareTo(b.fileStat.modified));
       return sortingList.map((e) => e.image).toList();
     case SortTypes.name:
       images.sort((a,b)=> C.fullPathToFile(a.path).compareTo(C.fullPathToFile(b.path)));

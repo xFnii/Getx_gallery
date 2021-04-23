@@ -67,34 +67,39 @@ class MainScreen extends StatelessWidget{
         Get.toNamed(OpenFolderScreen.route, arguments: _c.folders[index]);
       },
       behavior: HitTestBehavior.translucent,
-      child: Stack(
-        children: [
-          Container(
-            margin: index.isOdd? const EdgeInsets.all(1): const EdgeInsets.fromLTRB(0, 1, 1, 1),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: (thumbnail.isNotEmpty)? MemoryImage(thumbnail) : FileImage(File(_c.folders[index].images[0].path)) as ImageProvider
-              )
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 1,
-            child: Container(
-              alignment: Alignment.center,
-              height: 130/4,
-              color: Colors.black.withOpacity(0.8),
-              child: Text(
-                C.fullPathToFile(_c.folders[index].path),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
-                overflow: TextOverflow.ellipsis, maxLines: 2,)
+      child: Center(
+        child: Stack(
+          children: [
+            Hero(
+              tag: _c.folders[index].path,
+              child: Container(
+                margin: index.isOdd? const EdgeInsets.all(1): const EdgeInsets.fromLTRB(0, 1, 1, 1),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: (thumbnail.isNotEmpty)? MemoryImage(thumbnail) : FileImage(File(_c.folders[index].images[0].path)) as ImageProvider
+                  )
+                ),
               ),
             ),
-        ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 1,
+              child: Container(
+                alignment: Alignment.center,
+                height: 130/4,
+                color: Colors.black.withOpacity(0.8),
+                child: Text(
+                  C.fullPathToFile(_c.folders[index].path),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                  overflow: TextOverflow.ellipsis, maxLines: 2,)
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

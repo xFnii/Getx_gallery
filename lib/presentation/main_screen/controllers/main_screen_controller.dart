@@ -1,11 +1,8 @@
-import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
-import 'package:getx_gallery/data/isolates/create_thumbnail_isolate.dart';
+import 'package:getx_gallery/data/executor/thumbnail_creator.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
 import 'package:getx_gallery/presentation/common/controller/folder_controller.dart';
 import 'package:getx_gallery/resources/converter.dart';
@@ -57,6 +54,7 @@ class MainScreenController extends GetxController{
 
   void deleteAll(){
     folders.clear();
+    fc.clear();
     _executedThumbnailsPaths.clear();
     _repo.deleteAll();
   }
@@ -74,9 +72,9 @@ class MainScreenController extends GetxController{
   }
 
   Future _generateThumbnail(Folder folder) async {
-    compute(decodeIsolate, {'file': File(folder.images[0].path), 'width': 540}).then((value) {
+    ThumbnailCreator.create(path: folder.images[0].path, size: 540, callback: (th){
       print('thumb created ${folder.path}');
-      folder.addThumbnail(0, value);
+      folder.addThumbnail(0, th);
       _repo.updateFolder(folder);
     });
   }

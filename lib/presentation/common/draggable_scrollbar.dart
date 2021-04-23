@@ -14,7 +14,7 @@ typedef Widget ScrollThumbBuilder(
     });
 
 /// Build a Text widget using the current scroll offset
-typedef Text LabelTextBuilder(double offsetY);
+typedef Text? LabelTextBuilder(double offsetY);
 
 /// A widget that will display a BoxScrollView with a ScrollThumb that can be dragged
 /// for quick navigation of the BoxScrollView.

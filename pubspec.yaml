@@ -10,8 +10,6 @@ environment:
 dependencies:
   permission_handler: ^6.1.1
   watcher: ^1.0.0
-  path_provider_ex:
-    path: "plugins/path_provider_ex"
   hive: ^2.0.2
   isolate_handler: ^1.0.0
   flutter:
@@ -25,6 +23,7 @@ dependencies:
   path_provider: ^2.0.1
   path: ^1.8.0
   hive_flutter: ^1.0.0
+  shared_preferences: ^2.0.5
 
 dev_dependencies:
   build_runner: ^1.12.2

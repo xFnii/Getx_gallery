@@ -8,7 +8,7 @@ import 'package:getx_gallery/resources/excluded_folders.dart';
 import 'package:isolate_handler/isolate_handler.dart';
 
 final IsolateHandler isolates = Get.find();
-
+final hiddenFolders = <String>[];
 
 
 Future findImageIsolate({required String rootDir, required Function callback}) async {
@@ -32,70 +32,56 @@ void getFolders(Map<String, dynamic> context) {
 
   messenger.listen((data) {
     final String rootDir = data as String;
-
-    int size=0;
     print('Start file indexing');
-    final stopWatch = Stopwatch()..start();
-
-    final fh = FolderHelper(onFolderChange: messenger.send);
-    Directory(rootDir).list(recursive: true, followLinks: false).listen((FileSystemEntity event) {
-
-      bool skip = false;
-      for(final excludedFolder in excludedFolders){
-        if(event.path.contains(excludedFolder)){
-          skip = true;
-          break;
-        }
-      }
-      if(!skip){
-        ///Рекурсивно идём по папкам и файлам
-        ///Определяем папка это или же файл
-        final type = FileSystemEntity.typeSync(event.path);
-
-        ///Если папка, то меняем у [FolderHelper] рабочую папку на данную
-        if(type == FileSystemEntityType.directory) {
-          fh.nextFolder(event.path);
-          if(event.path.contains('/.')){
-            fh.hide();
-          }
-        }
-        ///Если файл, то он вложен в посленюю доблавленную папку
-        else {
-          final file = C.fullPathToFile(event.path);
-          if (file.toLowerCase()=='.nomedia') {
-            fh.hide();
-          } else if(file.contains(RegExp(r'\.(gif|jpe?g|tiff?|png|webp|bmp)$'))){
-            fh.add(event.path);
-            size++;
-          }
-        }
-
-      }
-    },
-        onDone: ()
-        {
-          fh.nextFolder('');
-          print('Search end, milliSec: ${stopWatch.elapsed.inMilliseconds}, size: $size');
-          messenger.send(true);
-        });
-
+    _getAllFiles(Directory(rootDir), messenger.send);
+    print('End file indexing');
   });
 }
 
+void _getAllFiles(Directory directory, Function(dynamic) onFolderChange){
+  bool skip = false;
+  for(final excludedFolder in excludedFolders){
+    if(directory.path.contains(excludedFolder)){
+      skip = true;
+      break;
+    }
+  }
+
+  if(!skip){
+    final fh = FolderHelper(onFolderChange: onFolderChange, currentFolder: directory.path);
+    if(directory.path.contains('/.')){
+      fh.hide();
+    }
+    final list = directory.listSync();
+    for(final e in list){
+      final type = FileSystemEntity.typeSync(e.path);
+      if(type == FileSystemEntityType.directory) {
+        _getAllFiles(Directory(e.path), onFolderChange);
+      } else if(type == FileSystemEntityType.file){
+        final file = C.fullPathToFile(e.path);
+        if (file.toLowerCase()=='.nomedia') {
+          fh.hide();
+        } else if(file.contains(RegExp(r'\.(gif|jpe?g|tiff?|png|webp|bmp)$'))){
+          fh.add(e.path);
+        }
+      }
+    }
+    fh.send();
+  }
+}
+
+
 class FolderHelper{
-  String currentFolder = '';
+  final String currentFolder;
   final paths = <String>[];
   final Function(dynamic) onFolderChange;
   bool hidden = false;
-  final _hiddenFolders = <String>[];
-  final _folders = <String>[];
-  final _folders2 = <String>[];
 
-  FolderHelper({required this.onFolderChange});
+  FolderHelper({required this.onFolderChange,required this.currentFolder});
 
   void hide(){
     if(!hidden) {
-      _hiddenFolders.add(currentFolder);
+      hiddenFolders.add(currentFolder);
       hidden = true;
     }
   }
@@ -104,20 +90,11 @@ class FolderHelper{
     paths.add(path);
   }
 
-  void nextFolder(String folder){
-    if(currentFolder.isEmpty){
-      currentFolder = folder;
-      return;
-    }
-
-    if(_folders.contains(currentFolder)) {
-      _folders2.add(currentFolder);
-    }
-    _folders.add(currentFolder);
+  void send(){
 
     ///Проверяем текущую папку на вложенность в скрытую. Все вложенные в скрытую папки должны быть так же скрыты.
     if(!hidden) {
-      for (final e in _hiddenFolders) {
+      for (final e in hiddenFolders) {
         if (currentFolder.contains(e)) {
           hidden = true;
         }
@@ -128,9 +105,6 @@ class FolderHelper{
     if(paths.isNotEmpty){
       onFolderChange(jsonEncode(_toEntity()));
     }
-    currentFolder = folder;
-    hidden = false;
-    paths.clear();
   }
 
   Folder _toEntity()=> Folder(

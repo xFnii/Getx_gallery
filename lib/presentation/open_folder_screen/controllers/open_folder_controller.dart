@@ -1,31 +1,46 @@
-import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
-import 'package:getx_gallery/data/entities/image.dart';
-import 'package:getx_gallery/data/isolates/create_thumbnail_isolate.dart';
+import 'package:getx_gallery/data/executor/thumbnail_creator.dart';
 import 'package:getx_gallery/data/repository/repository.dart';
+import 'package:getx_gallery/data/repository/settings.dart';
 import 'package:getx_gallery/presentation/common/controller/folder_controller.dart';
+import 'package:getx_gallery/resources/constants.dart';
 import 'package:getx_gallery/resources/enums/sort_types.dart';
 
 class OpenFolderScreenController extends GetxController{
   final folder = Folder.dummy().obs;
-  final Repository _repo = Get.find();
   final _executedThumbnailsPaths = <String>[];
+  final gridSize = Constants.basicGridSize.obs;
+  final Repository _repo = Get.find();
+  final Settings _settings = Get.find();
   final FolderController fc = Get.find();
 
   @override
   void onInit() {
     folder.value = Get.arguments;
     fc.openFolder(folder.value);
-    ever(fc.openedFolder, (_)=> _listenFolder());
+    gridSize.value = _settings.getGridSize();
+    // ignore: cast_nullable_to_non_nullable
+    ever(fc.openedFolder, (_)=>folder.value= _ as Folder);
+    generateThumbnails(((Get.size.height/Get.size.width*gridSize.value + 1)*gridSize.value).toInt());
     super.onInit();
   }
 
-  void _listenFolder(){
-    folder.value = fc.openedFolder.value;
+  void nextGridSize(){
+    generateThumbnails(((Get.size.height/Get.size.width*gridSize.value + 1)*gridSize.value).toInt());
+    gridSize.value = _settings.nextGridSize();
+  }
+
+  Future generateThumbnails(int pos) async {
+    final wishToGenerate = pos+gridSize.value*2;
+    final lastToGenerate = (wishToGenerate>folder.value.images.length)?folder.value.images.length: wishToGenerate;
+    for(int i=0; i < lastToGenerate; i++) {
+      if(folder.value.images[i].thumbnail.isEmpty){
+        _generateThumbnail(folder.value.images[i].path, i);
+      }
+    }
   }
 
   Future sort(SortTypes type) async {
@@ -34,22 +49,15 @@ class OpenFolderScreenController extends GetxController{
     _repo.updateFolder(sortedFolder);
   }
 
-  Uint8List getThumbnail(int index) {
-    final image = folder.value.images[index];
-    if(image.thumbnail.isEmpty && !_executedThumbnailsPaths.contains(image.path)){
-      _generateThumbnail(image, index);
-      _executedThumbnailsPaths.add(image.path);
-      return Uint8List(0);
-    } else {
-      return image.thumbnail;
+  Future _generateThumbnail(String path, int index) async {
+    if(!_executedThumbnailsPaths.contains(path)) {
+      await Future.delayed(Duration(milliseconds: 10));
+      ThumbnailCreator.create(path: path, size: 360, callback: (th) {
+        print('thumb created $path');
+        folder.value.addThumbnail(index, th);
+        _repo.updateFolder(folder.value);
+      });
+      _executedThumbnailsPaths.add(path);
     }
-  }
-  //
-  Future _generateThumbnail(Image image, int index) async {
-    compute(decodeIsolate, {'file':File(image.path), 'width': 360}).then((value) {
-      print('thumb created ' + image.path);
-      folder.value.addThumbnail(index, value);
-      _repo.updateFolder(folder.value);
-    });
   }
 }

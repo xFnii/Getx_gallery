@@ -51,4 +51,9 @@ class FolderController extends GetxController {
       list.sort((a,b) => C.fullPathToFile(a.path).toLowerCase().compareTo(C.fullPathToFile(b.path).toLowerCase()));
     }
   }
+
+  void clear(){
+    folders.clear();
+    visibleFolders.clear();
+  }
 }
