@@ -8,12 +8,12 @@ class Image{
   @HiveField(0)
   final String path;
   @HiveField(1)
-  final Uint8List? thumbnail;
+  final String? thumbnailPath;
 
-  Image ({this.path ='', this.thumbnail});
+  Image ({this.path ='', this.thumbnailPath = ''});
 
-  Image copyWith({String? path, Uint8List? thumbnail})=>Image(
+  Image copyWith({String? path, String? thumbnailPath})=>Image(
       path: path ?? this.path,
-      thumbnail: thumbnail ?? this.thumbnail,
+      thumbnailPath: thumbnailPath ?? this.thumbnailPath,
   );
 }

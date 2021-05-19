@@ -109,9 +109,10 @@ class FolderHelper{
 
   Folder _toEntity()=> Folder(
       path: currentFolder,
-      images: paths.map((e) => Image(path: e, thumbnail: Uint8List(0))).toList(),
+      images: paths.map((e) => Image(path: e, thumbnailPath: '')).toList(),
       hidden: hidden
   );
 }
+
 
 

@@ -2,23 +2,25 @@ import 'dart:typed_data';
 
 class Image {
   final String path;
-  final Uint8List thumbnail;
+  final String thumbnailPath;
 
-  Image({required this.path, required this.thumbnail});
+  Image({required this.path, required this.thumbnailPath});
 
   factory Image.fromJson(Map<String, dynamic> json) => Image(
     path: json['path'],
-    thumbnail: Uint8List.fromList(List<int>.from(json['thumbnail'] ?? []))
+    thumbnailPath: json['thumbnailPath']
   );
   Map<String, dynamic> toJson() => {
     'path': path,
-    'thumbnail': thumbnail
+    'thumbnailPath': thumbnailPath,
   };
 
   Image copyWith({
     String? path,
-    Uint8List? thumbnail})=>Image(
-    path: path ?? this.path,
-    thumbnail: thumbnail ?? this.thumbnail
+    Uint8List? thumbnail,
+    String? thumbnailPath
+  })=>Image(
+    thumbnailPath: thumbnailPath ?? this.thumbnailPath,
+    path: path ?? this.path
   );
 }

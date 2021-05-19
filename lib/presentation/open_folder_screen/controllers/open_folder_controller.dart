@@ -37,7 +37,7 @@ class OpenFolderScreenController extends GetxController{
     final wishToGenerate = pos+gridSize.value*2;
     final lastToGenerate = (wishToGenerate>folder.value.images.length)?folder.value.images.length: wishToGenerate;
     for(int i=0; i < lastToGenerate; i++) {
-      if(folder.value.images[i].thumbnail.isEmpty){
+      if(folder.value.images[i].thumbnailPath.isEmpty){
         _generateThumbnail(folder.value.images[i].path, i);
       }
     }
@@ -52,7 +52,7 @@ class OpenFolderScreenController extends GetxController{
   Future _generateThumbnail(String path, int index) async {
     if(!_executedThumbnailsPaths.contains(path)) {
       await Future.delayed(Duration(milliseconds: 10));
-      ThumbnailCreator.create(path: path, size: 360, callback: (th) {
+      ThumbnailCreator.create(path: path, size: 360, callback: (String th) {
         print('thumb created $path');
         folder.value.addThumbnail(index, th);
         _repo.updateFolder(folder.value);

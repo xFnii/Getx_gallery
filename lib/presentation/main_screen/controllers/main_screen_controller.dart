@@ -59,20 +59,20 @@ class MainScreenController extends GetxController{
     _repo.deleteAll();
   }
 
-  Uint8List getThumbnail(int index) {
+  String getThumbnail(int index) {
     final folder = folders[index];
     final image = folder.images[0];
-    if(image.thumbnail.isEmpty && !_executedThumbnailsPaths.contains(image.path)){
+    if(image.thumbnailPath.isEmpty && !_executedThumbnailsPaths.contains(image.path)){
       _generateThumbnail(folder);
       _executedThumbnailsPaths.add(image.path);
-      return Uint8List(0);
+      return '';
     } else {
-      return image.thumbnail;
+      return image.thumbnailPath;
     }
   }
 
   Future _generateThumbnail(Folder folder) async {
-    ThumbnailCreator.create(path: folder.images[0].path, size: 540, callback: (th){
+    ThumbnailCreator.create(path: folder.images[0].path, size: 540, callback: (String th){
       print('thumb created ${folder.path}');
       folder.addThumbnail(0, th);
       _repo.updateFolder(folder);

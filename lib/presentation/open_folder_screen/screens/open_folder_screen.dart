@@ -29,49 +29,53 @@ class OpenFolderScreen extends StatelessWidget{
                 icon: const Icon(Icons.grid_view, color: Colors.white),
                 label: Text(_c.gridSize.value.toString(), style: const TextStyle(color: Colors.white)),
             )),
-            PopupMenuButton(
-                icon: const Icon(Icons.sort),
-                itemBuilder: (_)=>[
-                  PopupMenuItem(
-                    value: SortTypes.name,
-                    child: Row(children: const [
-                      Icon(Icons.sort_by_alpha),
-                      SizedBox(width: 8),
-                      Text('NAME'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: SortTypes.date,
-                    child: Row(children: const [
-                      Icon(Icons.date_range),
-                      SizedBox(width: 8),
-                      Text('DATE'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: SortTypes.size,
-                    child: Row(children: const [
-                      Icon(Icons.photo_size_select_large),
-                      SizedBox(width: 8),
-                      Text('SIZE'),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: SortTypes.random,
-                    child: Row(
-                        children: const [
-                      Icon(Icons.shuffle),
-                      SizedBox(width: 8),
-                      Text('RND'),
-                    ]),
-                  ),
-                ],
-                onSelected: _c.sort
-            )
+            _buildSortingButton()
           ],
         ),
         body: Obx(()=> _buildGrid())
       ),
+    );
+  }
+
+  Widget _buildSortingButton(){
+    return PopupMenuButton(
+        icon: const Icon(Icons.sort),
+        itemBuilder: (_)=>[
+          PopupMenuItem(
+            value: SortTypes.name,
+            child: Row(children: const [
+              Icon(Icons.sort_by_alpha),
+              SizedBox(width: 8),
+              Text('NAME'),
+            ]),
+          ),
+          PopupMenuItem(
+            value: SortTypes.date,
+            child: Row(children: const [
+              Icon(Icons.date_range),
+              SizedBox(width: 8),
+              Text('DATE'),
+            ]),
+          ),
+          PopupMenuItem(
+            value: SortTypes.size,
+            child: Row(children: const [
+              Icon(Icons.photo_size_select_large),
+              SizedBox(width: 8),
+              Text('SIZE'),
+            ]),
+          ),
+          PopupMenuItem(
+            value: SortTypes.random,
+            child: Row(
+                children: const [
+                  Icon(Icons.shuffle),
+                  SizedBox(width: 8),
+                  Text('RND'),
+                ]),
+          ),
+        ],
+        onSelected: _c.sort
     );
   }
 
@@ -96,10 +100,10 @@ class OpenFolderScreen extends StatelessWidget{
   }
 
   Widget _buildItem(BuildContext context, int index){
-    final thumbnail = _c.folder.value.images[index].thumbnail;
+    final thumbnailPath = _c.folder.value.images[index].thumbnailPath;
     return GestureDetector(
       onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index}),
-      child:  (thumbnail.isNotEmpty)?
+      child:  (thumbnailPath.isNotEmpty)?
       Hero(
         tag: _c.folder.value.images[index].path,
         child: Container(
@@ -108,7 +112,7 @@ class OpenFolderScreen extends StatelessWidget{
           decoration: BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: (_c.gridSize>2) ? MemoryImage(thumbnail):  FileImage(File(_c.folder.value.images[index].path)) as ImageProvider
+                  image: (_c.gridSize>2) ? FileImage(File(thumbnailPath)):  FileImage(File(_c.folder.value.images[index].path)) as ImageProvider
               )
           ),
         ),
@@ -130,6 +134,5 @@ class OpenFolderScreen extends StatelessWidget{
     ///     max
     final lastElement = _c.folder.value.images.length*(_controller.offset+_controller.position.viewportDimension)/ _controller.position.maxScrollExtent - correction;
      _c.generateThumbnails(lastElement.toInt());
-
   }
 }

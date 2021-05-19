@@ -5,28 +5,27 @@ import 'package:getx_gallery/data/entities/entities.dart' as entities;
 
 class Image {
   final String path;
-  final Uint8List? thumbnail;
+  final String? thumbnailPath;
 
-  Image({required this.path, this.thumbnail});
+  Image({required this.path, this.thumbnailPath});
 
   Image.fromHive(hive.Image image)
       :
         path = image.path,
-        thumbnail = image.thumbnail;
+        thumbnailPath = image.thumbnailPath;
 
   Image.fromEntity(entities.Image image)
       :
+        thumbnailPath = image.thumbnailPath,
+        path = image.path;
 
-        path = image.path,
-        thumbnail = image.thumbnail;
-
-  hive.Image toHive({String? path, Uint8List? thumbnail}) => hive.Image(
+  hive.Image toHive({String? path, Uint8List? thumbnail, String? thumbnailPath}) => hive.Image(
     path: path ?? this.path,
-    thumbnail: thumbnail ?? this.thumbnail,
+    thumbnailPath: thumbnailPath ?? this.thumbnailPath
   );
 
   entities.Image toEntities() => entities.Image(
       path: path,
-      thumbnail: thumbnail ?? Uint8List(0),
+      thumbnailPath: thumbnailPath ?? ''
   );
 }

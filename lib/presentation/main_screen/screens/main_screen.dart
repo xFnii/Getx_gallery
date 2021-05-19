@@ -61,7 +61,7 @@ class MainScreen extends StatelessWidget{
   }
 
   Widget _buildItem(BuildContext context, int index){
-    final thumbnail = _c.getThumbnail(index);
+    final thumbnailPath = _c.getThumbnail(index);
     return GestureDetector(
       onTap: (){
         Get.toNamed(OpenFolderScreen.route, arguments: _c.folders[index]);
@@ -78,7 +78,7 @@ class MainScreen extends StatelessWidget{
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     fit: BoxFit.cover,
-                    image: (thumbnail.isNotEmpty)? MemoryImage(thumbnail) : FileImage(File(_c.folders[index].images[0].path)) as ImageProvider
+                    image: (thumbnailPath.isNotEmpty)? FileImage(File(thumbnailPath)) : FileImage(File(_c.folders[index].images[0].path)) as ImageProvider
                   )
                 ),
               ),

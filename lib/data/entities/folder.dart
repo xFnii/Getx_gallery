@@ -31,11 +31,11 @@ class Folder {
   //   images: List<Image>.from(images..replaceRange(index, index, images[index].copyWith(thumbnail: thumbnail)))
   // );
 
-  void addThumbnail(int index, Uint8List thumbnail)=> images[index] = images[index].copyWith(thumbnail: thumbnail);
+  void addThumbnail(int index, String thumbnailPath)=> images[index] = images[index].copyWith(thumbnailPath: thumbnailPath);
 
 
-  void addAll(List<String> list) => images.addAll(list.map((e) => Image(path: e, thumbnail: Uint8List(0))).toList());
-  void add(String item) => images.add(Image(path: item, thumbnail: Uint8List(0)));
+  void addAll(List<String> list) => images.addAll(list.map((e) => Image(path: e, thumbnailPath: '')).toList());
+  void add(String item) => images.add(Image(path: item, thumbnailPath: ''));
 
   factory Folder.fromJson(Map<String, dynamic> json) => _$FolderFromJson(json);
   Map<String, dynamic> toJson() => _$FolderToJson(this);
