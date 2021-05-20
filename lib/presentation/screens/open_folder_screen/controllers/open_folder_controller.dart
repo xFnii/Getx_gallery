@@ -65,25 +65,23 @@ class OpenFolderScreenController extends GetxController{
   }
 
   void scrollTo(int index){
-    /// Получение offset скролла по текущему элементу.
-    /// Обратная функция к написанным в _scrollListener
-    /// max*(lastElement*max - len*v)
-    /// ─────────────────────────────
-    ///        len(max-view)
-    final offset = scrollController.position.maxScrollExtent * (index * scrollController.position.maxScrollExtent - folder.value.images.length * scrollController.position.viewportDimension)/(folder.value.images.length * (scrollController.position.maxScrollExtent - scrollController.position.viewportDimension));
-    scrollController.jumpTo(offset);
+    /// Get scroll offset by current element.
+    final row = index ~/ gridSize.value;
+    final offset = (Get.width/gridSize.value) * (row + 1) - scrollController.position.viewportDimension;
+    if(offset>scrollController.offset) {
+      scrollController.jumpTo(offset);
+    }
   }
 
   void _scrollListener(){
-    print(scrollController.offset);
-    /// Коррекция изменения offset скролла.
-    /// При начальном положении скролла равно 0, при максимальном количеству элементов, которые поместятся на одном экране
+    /// Correction of scroll offset change
+    /// On initial scroll position equal 0, on last - maximum number of elements, that fit on one screen
     /// view*len*offset
     /// ───────────────
     ///     max^2
     final correction = scrollController.position.viewportDimension * folder.value.images.length * scrollController.offset/(scrollController.position.maxScrollExtent * scrollController.position.maxScrollExtent);
 
-    /// Вычисление номер последнего элемента на экране.
+    /// Count last element on screen
     /// len*(offset+view)
     /// ───────────────     – [correction]
     ///     max

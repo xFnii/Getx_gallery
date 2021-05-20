@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/folder.dart';
@@ -21,8 +20,7 @@ class MainScreenController extends GetxController{
   final _executedThumbnailsPaths = <String>[];
   final Settings _settings = Get.find();
   final FolderController folderController = Get.find();
-
-  int get _lastVisibleImageIndex => ((Get.size.height/Get.size.width*gridSize.value + 1)*gridSize.value).toInt();
+  final ScrollController scrollController = ScrollController();
 
 
   @override
@@ -88,7 +86,7 @@ class MainScreenController extends GetxController{
   Future find() async => _repo.find();
 
   String getScrollText(double offset){
-    final pos = offset ~/ 100;
+    final pos = offset ~/ (Get.width/gridSize.value)*gridSize.value;
     if(pos == folders.length) {
       return C.fullPathToFile(folders.last.path);
     } else {

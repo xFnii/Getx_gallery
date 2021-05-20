@@ -100,8 +100,8 @@ class OpenFolderScreen extends StatelessWidget{
   Widget _buildItem(BuildContext context, int index){
     final thumbnailPath = _c.folder.value.images[index].thumbnailPath;
     return GestureDetector(
-      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index, 'scrollController': _c.scrollController}),
-      child:  (thumbnailPath.isNotEmpty)?
+      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index, 'offsetCallback': _c.scrollTo}),
+      child: (thumbnailPath.isNotEmpty)?
       Hero(
         tag: _c.folder.value.images[index].path,
         child: Container(

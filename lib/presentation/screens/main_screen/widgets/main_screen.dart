@@ -11,7 +11,6 @@ import 'package:getx_gallery/resources/converter.dart';
 class MainScreen extends StatelessWidget{
 
   final MainScreenController _c = Get.find();
-  final ScrollController _scrollController = ScrollController();
 
   static String route = '/main';
 
@@ -29,7 +28,7 @@ class MainScreen extends StatelessWidget{
           IconButton(icon: const Icon(Icons.sync), onPressed: ()=> _c.find()),
           IconButton(icon: Obx(()=>_c.showHidden.value? const Icon(Icons.remove_red_eye_outlined):const Icon(Icons.remove_red_eye)), onPressed: (){
             _c.toggleHidden();
-            _scrollController.jumpTo(_scrollController.initialScrollOffset);
+            _c.scrollController.jumpTo(_c.scrollController.initialScrollOffset);
           }),
         ],
       ),
@@ -52,9 +51,9 @@ class MainScreen extends StatelessWidget{
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-          controller: _scrollController,
+          controller: _c.scrollController,
           child: GridView.builder(
-            controller: _scrollController,
+            controller: _c.scrollController,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _c.gridSize.value
             ),
