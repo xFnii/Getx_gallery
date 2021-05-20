@@ -17,5 +17,7 @@ enum SortTypes{
   @HiveField(5)
   reverseSize,
   @HiveField(6)
-  random
+  random,
+  @HiveField(7)
+  undefined
 }

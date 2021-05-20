@@ -32,28 +32,8 @@ class MainActivity: FlutterFragmentActivity () {
         }
     }
 
-    fun getAllFiles(file: File) : List<String>{
-        var flag = false
-        if(file.path.contains("/loli")){
-            Log.d("NEWFOLDER", file.path)
-            flag = true
-        }
-        val result = mutableListOf<String>()
-        for(f in file.listFiles()){
-            if(f.isFile){
-                if(flag) Log.d("ADDFILE", f.path)
-                result.add(f.path)
-            } else if(f.isDirectory) {
-                result.addAll(getAllFiles(f))
-            }
-        }
-        return result;
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
-    }
-
-
+    }   
 }

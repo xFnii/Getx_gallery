@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_gallery/presentation/full_image_screen/bindings/full_image_screen_binding.dart';
-import 'package:getx_gallery/presentation/full_image_screen/screens/full_image_screen.dart';
-import 'package:getx_gallery/presentation/main_screen/bindings/main_screen_binding.dart';
-import 'package:getx_gallery/presentation/main_screen/screens/main_screen.dart';
-import 'package:getx_gallery/presentation/open_folder_screen/bindings/open_folder_screen_binding.dart';
-import 'package:getx_gallery/presentation/open_folder_screen/screens/open_folder_screen.dart';
 import 'package:getx_gallery/resources/themes.dart';
 import 'package:getx_gallery/translation/translation.dart';
 import 'init.dart';
+import 'presentation/screens/full_image_screen/full_image_screen.dart';
+import 'presentation/screens/main_screen/main_screen.dart';
+import 'presentation/screens/open_folder_screen/open_folder_screen.dart';
 
 
 Future<void> main() async {

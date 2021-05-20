@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:getx_gallery/data/entities/entities.dart';
 import 'package:getx_gallery/resources/converter.dart';
@@ -92,7 +91,7 @@ class FolderHelper{
 
   void send(){
 
-    ///Проверяем текущую папку на вложенность в скрытую. Все вложенные в скрытую папки должны быть так же скрыты.
+    ///Checking the current folder for nesting in a hidden one. All nested folders in hidden folders must be hidden as well.
     if(!hidden) {
       for (final e in hiddenFolders) {
         if (currentFolder.contains(e)) {
@@ -101,7 +100,7 @@ class FolderHelper{
       }
     }
 
-    ///Если в папке есть есть какие-либо элементы, то передаем её обатно, в ином случае переходим на следющую рабочую папку
+    ///If folder is empty we going to next one
     if(paths.isNotEmpty){
       onFolderChange(jsonEncode(_toEntity()));
     }
@@ -109,9 +108,10 @@ class FolderHelper{
 
   Folder _toEntity()=> Folder(
       path: currentFolder,
-      images: paths.map((e) => Image(path: e, thumbnail: Uint8List(0))).toList(),
+      images: paths.map((e) => Image(path: e, thumbnailPath: '')).toList(),
       hidden: hidden
   );
 }
+
 
 
