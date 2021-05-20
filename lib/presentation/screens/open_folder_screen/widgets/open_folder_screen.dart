@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_gallery/presentation/common/draggable_scrollbar.dart';
-import 'package:getx_gallery/presentation/full_image_screen/screens/full_image_screen.dart';
-import 'package:getx_gallery/presentation/open_folder_screen/controllers/open_folder_controller.dart';
+import 'package:getx_gallery/presentation/screens/full_image_screen/widgets/full_image_screen.dart';
+import 'package:getx_gallery/presentation/screens/open_folder_screen/controllers/open_folder_controller.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/resources/enums/sort_types.dart';
 
@@ -12,11 +12,9 @@ class OpenFolderScreen extends StatelessWidget{
 
   final OpenFolderScreenController _c = Get.find();
   static String route = '/open_folder';
-  final ScrollController _controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    _controller.addListener(_scrollListener);
     return Hero(
       tag: _c.folder.value.path,
       child: Scaffold(
@@ -86,10 +84,10 @@ class OpenFolderScreen extends StatelessWidget{
             maxWidth: Get.width-60,
             maxHeight: 40,
           ),
-          controller: _controller,
+          controller: _c.scrollController,
           child:
           GridView.builder(
-            controller: _controller,
+            controller: _c.scrollController,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _c.gridSize.value
             ),
@@ -102,7 +100,7 @@ class OpenFolderScreen extends StatelessWidget{
   Widget _buildItem(BuildContext context, int index){
     final thumbnailPath = _c.folder.value.images[index].thumbnailPath;
     return GestureDetector(
-      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index}),
+      onTap: () => Get.toNamed(FullImageScreen.route, arguments: {'images': _c.folder.value.images, 'initialPage': index, 'scrollController': _c.scrollController}),
       child:  (thumbnailPath.isNotEmpty)?
       Hero(
         tag: _c.folder.value.images[index].path,
@@ -120,19 +118,5 @@ class OpenFolderScreen extends StatelessWidget{
     );
   }
 
-  void _scrollListener(){
-    /// Коррекция изменения offset скролла.
-    /// При начальном положении скролла равно 0, при максимальном количеству элементов, которые поместятся на одном экране
-    /// view*len*offset
-    /// ───────────────
-    ///     max^2
-    final correction = _controller.position.viewportDimension * _c.folder.value.images.length * _controller.offset/(_controller.position.maxScrollExtent * _controller.position.maxScrollExtent);
 
-    /// Вычисление номер последнего элемента на экране.
-    /// len*(offset+view)
-    /// ───────────────     – [correction]
-    ///     max
-    final lastElement = _c.folder.value.images.length*(_controller.offset+_controller.position.viewportDimension)/ _controller.position.maxScrollExtent - correction;
-     _c.generateThumbnails(lastElement.toInt());
-  }
 }

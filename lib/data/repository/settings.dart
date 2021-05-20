@@ -3,11 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 abstract class Settings{
   final SharedPreferences sharedPreferences;
 
-  static const gridSizeKey = 'GRID_SIZE';
+  static const imageGridSizeKey = 'IMAGE_GRID_SIZE';
+  static const folderGridSizeKey = 'FOLDER_GRID_SIZE';
 
   Settings({required this.sharedPreferences});
 
-  int nextGridSize();
+  int nextImageGridSize();
 
-  int getGridSize();
+  int getImageGridSize();
+
+  int nextFolderGridSize();
+
+  int getFolderGridSize();
 }
