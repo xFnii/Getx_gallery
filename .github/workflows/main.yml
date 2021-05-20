@@ -1,10 +1,10 @@
 name: Build workflow
 on:
   push:
-    branches: [ master, develope]
+    branches: [master, develope]
 jobs:
-  run:
-    name: Run
+  build_apk:
+    name: Build android APK
     runs-on: ubuntu-latest
     
     steps:
@@ -18,3 +18,8 @@ jobs:
     - run: flutter pub get
     - run: flutter pub run build_runner build
     - run: flutter build apk
+    - name: upload artifacts
+      uses: actions/upload-artifact@master
+      with:
+        name: apk-build
+        path: build/app/outputs/apk/release
