@@ -12,6 +12,7 @@ class MainScreen extends StatelessWidget{
 
   final MainScreenController _c = Get.find();
 
+  final ScrollController _scrollController = ScrollController();
   static String route = '/main';
 
   @override
@@ -28,7 +29,7 @@ class MainScreen extends StatelessWidget{
           IconButton(icon: const Icon(Icons.sync), onPressed: ()=> _c.find()),
           IconButton(icon: Obx(()=>_c.showHidden.value? const Icon(Icons.remove_red_eye_outlined):const Icon(Icons.remove_red_eye)), onPressed: (){
             _c.toggleHidden();
-            _c.scrollController.jumpTo(_c.scrollController.initialScrollOffset);
+           _scrollController.jumpTo(_scrollController.initialScrollOffset);
           }),
         ],
       ),
@@ -51,9 +52,9 @@ class MainScreen extends StatelessWidget{
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-          controller: _c.scrollController,
+          controller:_scrollController,
           child: GridView.builder(
-            controller: _c.scrollController,
+            controller:_scrollController,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _c.gridSize.value
             ),
@@ -99,7 +100,7 @@ class MainScreen extends StatelessWidget{
                   C.fullPathToFile(_c.folders[index].path),
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white),
-                  overflow: TextOverflow.ellipsis, maxLines: 2,)
+                  overflow: TextOverflow.ellipsis, maxLines: 2)
                 ),
               ),
           ],

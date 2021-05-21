@@ -1,10 +1,12 @@
 
 import 'package:getx_gallery/data/entities/folder.dart';
+import 'package:getx_gallery/presentation/common/controller/folder_controller.dart';
 
 abstract class Repository {
-  Future find();
+  void find();
   Stream<Folder> watchFolders();
-  Future getFolders();
+  void actualizeFolders();
+  List<Folder> getFolders();
   void updateFolder(Folder folder);
   void deleteAll();
 }

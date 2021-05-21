@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:getx_gallery/presentation/common/draggable_scrollbar.dart';
 import 'package:getx_gallery/presentation/screens/full_image_screen/widgets/full_image_screen.dart';
 import 'package:getx_gallery/presentation/screens/open_folder_screen/controllers/open_folder_controller.dart';
+import 'package:getx_gallery/resources/constants.dart';
 import 'package:getx_gallery/resources/converter.dart';
 import 'package:getx_gallery/resources/enums/sort_types.dart';
 
@@ -12,6 +13,7 @@ class OpenFolderScreen extends StatelessWidget{
 
   final OpenFolderScreenController _c = Get.find();
   static String route = '/open_folder';
+  late Offset _gridSizeMenuPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +24,27 @@ class OpenFolderScreen extends StatelessWidget{
           title: Text(C.fullPathToFile(_c.folder.value.path)),
           leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: Get.back),
           actions: [
-            Obx(()=> TextButton.icon(
-                onPressed: _c.nextGridSize,
-                icon: const Icon(Icons.grid_view, color: Colors.white),
-                label: Text(_c.gridSize.value.toString(), style: const TextStyle(color: Colors.white)),
+            Obx(()=> GestureDetector(
+              onTap: _c.nextGridSize,
+              onLongPress: () => showMenu(
+                  context: context,
+                  position: RelativeRect.fromRect(
+                      _gridSizeMenuPosition & const Size(40,40),
+                      Offset.zero & (Overlay.of(context)!.context.findRenderObject() as RenderBox?)!.size
+                  ),
+                  items: <PopupMenuEntry<int>>[
+                    for(int i = Constants.minImageGridSize; i <= Constants.maxImageGridSize; i++)
+                      PopupMenuItem(value: i, child: Text(i.toString(), style: const TextStyle(color: Colors.white)))
+                  ]
+              ).then((value) => _c.setGridSize(value)),
+              onLongPressStart: (lpd) =>  _gridSizeMenuPosition = lpd.globalPosition,
+              child:  Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.grid_view, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(_c.gridSize.value.toString(), style: const TextStyle(color: Colors.white))],
+              ),
             )),
             _buildSortingButton()
           ],
@@ -117,6 +136,4 @@ class OpenFolderScreen extends StatelessWidget{
       ): const Center(child: Text('X')),
     );
   }
-
-
 }

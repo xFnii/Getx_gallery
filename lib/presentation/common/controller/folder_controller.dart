@@ -40,6 +40,17 @@ class FolderController extends GetxController {
     );
   }
 
+  void getFolders() {
+    // final folders = _repo.getFolders();
+    // for(final folder in folders){
+    //   if(!folder.hidden) {
+    //     visibleFolders.add(folder);
+    //   }
+    //   this.folders.add(folder);
+    // }
+    _repo.actualizeFolders();
+  }
+
   // ignore: use_setters_to_change_properties
   void openFolder(Folder folder) => openedFolder.value = folder;
 

@@ -22,6 +22,11 @@ class SettingsImpl extends Settings{
   int getImageGridSize() => sharedPreferences.getInt(Settings.imageGridSizeKey) ?? Constants.basicImageGridSize;
 
   @override
+  void setImageGridSize(int size) {
+    sharedPreferences.setInt(Settings.imageGridSizeKey, size);
+  }
+
+  @override
   int nextFolderGridSize() {
     final gridSize = getFolderGridSize();
     var newGridSize = Constants.minFolderGridSize;
@@ -35,5 +40,8 @@ class SettingsImpl extends Settings{
   @override
   int getFolderGridSize() => sharedPreferences.getInt(Settings.folderGridSizeKey) ?? Constants.basicFolderGridSize;
 
-
+  @override
+  void setFolderGridSize(int size) {
+    sharedPreferences.setInt(Settings.folderGridSizeKey, size);
+  }
 }

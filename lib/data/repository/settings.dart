@@ -12,7 +12,11 @@ abstract class Settings{
 
   int getImageGridSize();
 
+  void setImageGridSize(int size);
+
   int nextFolderGridSize();
 
   int getFolderGridSize();
+
+  void setFolderGridSize(int size);
 }

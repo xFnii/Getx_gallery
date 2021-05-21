@@ -19,30 +19,30 @@ class MainScreenController extends GetxController{
   final folders = <Folder>[].obs;
   final _executedThumbnailsPaths = <String>[];
   final Settings _settings = Get.find();
-  final FolderController folderController = Get.find();
-  final ScrollController scrollController = ScrollController();
+  final FolderController _folderController = Get.find();
 
 
   @override
   Future onInit() async{
-    ever(folderController.folders, (_)=> _listenFolders());
+    ever(_folderController.folders, (_)=> _listenFolders());
     super.onInit();
   }
+
   @override
   Future onReady() async {
     if (!await Permission.storage.request().isGranted){
       Get.snackbar('permission_declined'.tr, 'next_time_accept'.tr, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
     } else {
-      _repo.getFolders();
+      _folderController.getFolders();
     }
     super.onReady();
   }
 
   void _listenFolders(){
     if(showHidden.value){
-      folders.value = folderController.folders;
+      folders.value = _folderController.folders;
     } else {
-      folders.value = folderController.visibleFolders;
+      folders.value = _folderController.visibleFolders;
     }
   }
 
@@ -50,15 +50,15 @@ class MainScreenController extends GetxController{
     showHidden.value = !showHidden.value;
     Get.snackbar(showHidden.value? 'hidden'.tr: 'shown'.tr, showHidden.value? 'folders_are_visible'.tr: 'folders_are_invisible'.tr, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM, duration: const Duration(seconds: 1, milliseconds: 500));
     if(showHidden.value){
-      folders.value = folderController.folders;
+      folders.value = _folderController.folders;
     } else {
-      folders.value = folderController.visibleFolders;
+      folders.value = _folderController.visibleFolders;
     }
   }
 
   void deleteAll(){
     folders.clear();
-    folderController.clear();
+    _folderController.clear();
     _executedThumbnailsPaths.clear();
     _repo.deleteAll();
   }

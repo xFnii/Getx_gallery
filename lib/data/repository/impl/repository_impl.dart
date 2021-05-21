@@ -22,7 +22,10 @@ class RepositoryImpl implements Repository{
   Stream<Folder> watchFolders() => _localDataSource.watchFolders().map((event) => event.toEntities());
 
   @override
-  Future getFolders() async {
+  List<Folder> getFolders() => (_localDataSource.getFolders()).map((e) => e.toEntities()).toList();
+
+  @override
+  void actualizeFolders() {
     final folders = (_localDataSource.getFolders()).map((e) => e.toEntities()).toList();
     if(folders.isNotEmpty) {
       actualizerIsolate(folders, _actualizerHandler);
@@ -54,7 +57,7 @@ class RepositoryImpl implements Repository{
     }
   }
 
-  Future _findHandler(String jsonFolder) async {
+  void _findHandler(String jsonFolder) {
     final newFolder = Folder.fromJson(jsonDecode(jsonFolder));
     final oldFolder = _localDataSource.getFolder(newFolder.path.hashCode);
     if(oldFolder.path.isEmpty) {

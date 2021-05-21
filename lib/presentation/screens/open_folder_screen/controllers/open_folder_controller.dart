@@ -36,6 +36,13 @@ class OpenFolderScreenController extends GetxController{
     gridSize.value = _settings.nextImageGridSize();
   }
 
+  void setGridSize(int? size){
+    if(size==null) return;
+    _generateThumbnails(_lastVisibleImageIndex);
+    gridSize.value = size;
+    _settings.setImageGridSize(size);
+  }
+
   void _generateThumbnails(int pos) {
     final wishToGenerate = pos+gridSize.value*2;
     final lastToGenerate = (wishToGenerate>folder.value.images.length)?folder.value.images.length: wishToGenerate;
